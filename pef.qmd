@@ -13,6 +13,7 @@ format:
 editor: visual
 bibliography: refs/references.bib
 csl: refs/apa.csl
+jupyter: python3
 ---
 
 {{< pagebreak >}}
@@ -736,6 +737,188 @@ Los parámetros operativos principales son:
 | Frecuencia de re-estimación Rolling Window        | cada 21 días hábiles    |
 
 # Resultados
+## Evidencia empírica inicial de la serie de retornos
+
+La serie diaria de retornos logarítmicos del Dow Jones Industrial Average presenta rasgos consistentes con la necesidad de modelar la volatilidad de forma dinámica. El rendimiento promedio diario es positivo, aunque pequeño, con una media de 0.0222% y una desviación estándar diaria de 1.1591%. 
+
+La @fig-returns muestra la evolución temporal de los retornos diarios. Se observan episodios de alta volatilidad concentrados en ciertos periodos, lo que sguiere que al varianza no permanece constante en el tiempo.
+
+![Retornos Logarítmicos Diarios del DJIA](figures/returns.png){#fig-returns}
+
+La asimetría negativa de -0.3478 indica que las caídas extremas tienden a ser más pronunciadas que los movimientos positivos equivalentes, mientras que la curtosis de Pearson de 15.9585 confirma una distribución altamente leptocúrtica. Esta evidencia es coherente con la presencia de colas pesadas, eventos extremos y desviaciones respecto al supuesto normal.
+
+| Estadístico                           |   Valor |
+| ------------------------------------- | ------: |
+| Media diaria (%)                      |  0.0222 |
+| Desviación estándar diaria (%)        |  1.1591 |
+| Asimetría                             | -0.3478 |
+| Curtosis excedente                    | 12.9585 |
+| Curtosis de Pearson                   | 15.9585 |
+| Grados de libertad t-Student ajustada |  2.7097 |
+
+: Estadísticos descriptivos de los retornos diarios del DJIA {#tbl-statistics}
+
+La evidencia descriptiva se refuerza visualmente al comparar la distribución empírica de los retornos con una distribución normal y una Student-t ajustada.
+
+![Distribución de los Retornos Diarios del DJIA frente a Distribuciones Normal y Student-t Ajustada](figures/fig-dist.png){#fig-dist fig-alt="La distribución empírica presenta mayor concentración alrededor de cero y colas más pesadas que la normal. La Student-t ajustada captura mejor la leptocurtosis observada."}
+
+La distribución de los retornos muestra una concentración elevada alrededor de cero y colas más pesadas que la distribución normal. La distribución Student-t ajustada, con 2.71 grados de libertad, captura mejor esta característica que una distribución normal. Este resultado respalda el uso de innovaciones con distribución Student-t o sesgadas en varios de los modelos estimados.
+
+Las pruebas de diagnóstico refuerzan la pertinencia del enfoque GARCH. La prueba ADF rechaza la hipótesis de raíz unitaria con un estadístico de -15.703 y un p-value cercano a cero, por lo que la serie de retornos puede tratarse como estacionaria. Sin embargo, la prueba Ljung-Box aplicada sobre los retornos muestra dependencia serial acumulada estadísticamente significativa para los rezagos 10 y 20. Al aplicar la misma prueba a la varianza realizada, los estadísticos aumentan considerablemente y los p-values son cero, lo que representa evidencia de dependencia temporal fuerte en los segundos momentos.
+
+| Prueba                     | Estadístico |  p-value | Interpretación                                 |
+| -------------------------- | ----------: | -------: | ---------------------------------------------- |
+| ADF sobre retornos         |    -15.7030 |   0.0000 | Retornos estacionarios                         |
+| Ljung-Box retornos, lag 10 |    107.7131 | 1.54e-18 | Autocorrelación estadísticamente significativa |
+| Ljung-Box retornos, lag 20 |    179.0500 | 1.49e-27 | Autocorrelación estadísticamente significativa |
+| Ljung-Box varianza, lag 10 |   6232.1262 |   0.0000 | Fuerte dependencia en volatilidad              |
+| Ljung-Box varianza, lag 20 |   8286.6317 |   0.0000 | Fuerte dependencia en volatilidad              |
+
+: Pruebas de estacionariedad y autocorrelación {#tbl-tests}
+
+La evidencia de dependencia en la varianza también se observa directamente en la serie de varianza diaria realizada.
+
+![Varianza Diaria Realizada del DJIA](figures/fig-variance.png){#fig-variance}
+
+En conjunto, los resultados muestran que el comportamiento de la volatilidad no es compatible con una varianza constante. La serie presenta colas pesadas, asimetría negativa y clustering de volatilidad, elementos que justifican el uso de modelos ARCH/GARCH y de extensiones asimétricas.
+
+Para complementar la lectura visual anterior, la @fig-acf presenta las funciones de autocorrelación (ACF) y autocorrelación parcial (PACF) de la varianza diaria.
+
+![ACF y PACF de la Varianza Diaria Realizada](figures/fig-acf.png){#fig-acf}
+
+La persistencia observada en la ACF de la varianza confirma que los segundos momentos de la serie contienen información predictiva. Este resultado es central para justificar modelos donde la varianza condicional depende de choques pasados y de su propia dinámica rezagada.
+
+## Resultados in-sample bajo esquema Fixed Window
+
+La comparación in-sample se realizó mediante los criterios AIC y BIC. Ambos criterios penalizan la complejidad del modelo, aunque el BIC lo hace de forma más estricta. En este estudio, el modelo APARCH(1,1,1) con distribución Skewed Student-t es el que obtuvo el mejor ajuste, con el menor AIC y el menor BIC.
+
+|  # | Modelo de media | Proceso de volatilidad | Distribución     |            AIC |            BIC |
+| -: | --------------- | ---------------------- | ---------------- | -------------: | -------------: |
+|  1 | Media constante | ARCH(1)                | Student-t        |     12639.0054 |     12664.6766 |
+|  2 | AR(1)           | GARCH(1,1)             | Student-t        |     11737.1110 |     11775.6166 |
+|  3 | AR(1)           | EGARCH(1,1)            | Normal           |     11922.9646 |     11955.0525 |
+|  4 | AR(1)           | GJR-GARCH(1,1)         | Student-t        |     11584.4499 |     11629.3730 |
+|  5 | AR(1)           | APARCH(1,1)            | Skewed Student-t | 11511.0937 | 11568.8520 |
+
+: Comparación in-sample: AIC y BIC {#tbl-AICBIC}
+
+El resultado favorece claramente a una especificación flexible y asimétrica. La ventaja de APARCH sobre GJR-GARCH es de aproximadamente 73.36 puntos en AIC y 60.52 puntos en BIC, lo que sugiere que la mejora de ajuste no proviene únicamente de agregar parámetros. Además, el parámetro de asimetría estimado en APARCH y la distribución Skewed Student-t capturan dos rasgos observados en la serie: respuesta diferencial ante choques negativos y distribución no simétrica de innovaciones.
+
+Sin embargo, el ranking in-sample no debe interpretarse como evidencia definitiva de superioridad predictiva. La comparación con los resultados fuera de muestra muestra que el mejor ajuste estadístico dentro de la muestra no necesariamente coincide con el mejor desempeño predictivo o económico.
+
+## Pronóstico out-of-sample de Volatilidad
+
+La evaluación fuera de muestra cubre el periodo del 2 de enero de 2018 al 1 de diciembre de 2025, con 1990 observaciones de pronóstico de varianza acumulada a 21 días. La métrica principal es QLIKE, donde valores más bajos indican mejor desempeño predictivo. El uso de varianza acumulada a 21 días es consistente con la idea de que la volatilidad relevante para una opción debe reflejar el riesgo durante la vida del contrato.
+
+| Ranking | Modelo                        |      QLIKE |
+| ------: | ----------------------------- | ---------: |
+|       1 | EGARCH(1,1) Fixed-Window      |     0.4203 |
+|       2 | GARCH(1,1) Fixed-Window       |     0.4355 |
+|       3 | GARCH(1,1) Rolling-Window     |     0.4650 |
+|       4 | GJR-GARCH(1,1) Fixed-Window   |     0.4813 |
+|       5 | APARCH(1,1) Fixed-Window      |     0.4839 |
+|       6 | APARCH(1,1) Rolling-Window    |     0.5222 |
+|       7 | GJR-GARCH(1,1) Rolling-Window |     0.5289 |
+|       8 | EGARCH(1,1) Rolling-Window    |     0.5298 |
+|       9 | ARCH(1) Fixed-Window          |     0.6201 |
+|      10 | ARCH(1) Rolling-Window        |     0.9479 |
+
+: QLIKE out-of-sample contra Varianza Realizada {#tbl-QLIKE_RV}
+
+El mejor desempeño frente a varianza realizada corresponde a EGARCH(1,1) con ventana fija. Esto es relevante porque EGARCH no fue el mejor modelo in-sample por AIC/BIC; aun así, genera la pérdida QLIKE más baja fuera de muestra. El segundo lugar corresponde a GARCH(1,1) con ventana fija, lo que confirma que una especificación parsimoniosa puede ser altamente competitiva en pronóstico agregado de volatilidad. ARCH(1), especialmente bajo rolling window, presenta el peor desempeño, lo que indica que incorporar únicamente choques rezagados sin persistencia suficiente en la varianza condicional es insuficiente para este horizonte.
+
+La comparación entre esquemas de estimación también es informativa. Para el criterio QLIKE contra varianza realizada, las especificaciones con ventana fija dominan en varios casos a sus versiones rolling. Esto sugiere que, en el pronóstico estadístico agregado de varianza a 21 días, estimar con una base histórica amplia puede aportar estabilidad y reducir la variabilidad de parámetros.
+
+FIGURA X - PENDIENTE: PRONOSTICOS OUT-OF-SAMPLE DE VOLATILIDAD PARA MODELOS SELECCIONADOS
+
+PARRAFO INTERPRETANDO FIGURA X
+
+Los diagnósticos visuales modelo por modelo se reportan en el Anexo A. [PENDIENTE CREAR ANEXO] En conjunto, estos gráficos confirman que las especificaciones con menor QLIKE presentan menor dispersión relativa frente a la volatilidad realizada, mientras que ARCH, especialmente bajo rolling window, muestra errores más amplios y menor capacidad para capturar episodios de volatilidad elevada.
+
+Como contraste adicional, se compararon los pronósticos de volatilidad anualizada contra la volatilidad implícita observada en el dataset de opciones.
+
+| Ranking | Modelo                         |      QLIKE |
+| ------: | ------------------------------ | ---------: |
+|       1 | ARCH(1) Rolling-Window         |     0.4564 |
+|       2 | ARCH(1) Fixed-Window           |     0.4569 |
+|       3 | EGARCH(1,1) Rolling-Window     |     0.7736 |
+|       4 | GARCH(1,1) Rolling-Window      |     0.8090 |
+|       5 | EGARCH(1,1) Fixed-Window       |     0.8378 |
+|       6 | APARCH(1,1) Rolling-Window     |     0.8800 |
+|       7 | Volatilidad histórica 252 días |     0.8912 |
+|       8 | GARCH(1,1) Fixed-Window        |     0.9037 |
+|       9 | GJR-GARCH(1,1) Rolling-Window  |     0.9192 |
+|      10 | APARCH(1,1) Fixed-Window       |     0.9885 |
+|      11 | GJR-GARCH(1,1) Fixed-Window    |     1.0312 |
+
+: QLIKE out-of-sample contra Volatilidad Implícita {#tbl-QLIKE_IV}
+
+Este ranking cambia de forma considerable respecto al obtenido con varianza realizada. ARCH aparece cerca de la volatilidad implícita, pero ese resultado no implica que sea superior para pricing. La volatilidad implícita incorpora primas de riesgo, expectativas de mercado y efectos cross-section por strike y tipo de opción, mientras que los modelos GARCH generan una volatilidad por fecha basada en la historia del subyacente. Por ello, la comparación contra volatilidad implícita debe interpretarse como un contraste de cercanía al mercado, no como una prueba directa de capacidad predictiva ni de precisión económica.
+
+La diferencia entre los rankings confirma que el desempeño de un modelo depende del objeto de evaluación: varianza realizada, volatilidad implícita o precio de opción. Esto refuerza la idea de que un modelo puede minimizar errores de volatilidad y no necesariamente minimizar errores de pricing, y viceversa.
+
+## Aplicación Económica: Pricing de Opciones
+La evaluación económica se realizó usando los pronósticos en precios de contratos tras evaluar el modelo Black-Scholes con la volatilidad anualizada derivada de los modelos GARCH como input.
+
+La muestra final contiene 10,152 contratos de opciones que se clasificaron por moneyness para evaluar si el desempeño de los modelos cambia según la posición relativa del strike y el subyacente. La clasificación utiliza la razón de moneyness definida como $\mathrm{MNY}$ de forma que valores cercanos a uno representen opciones at-the-money tanto para calls como para puts.
+
+| Categoría          | Rango de moneyness                | Observaciones |
+| ------------------ | --------------------------------- | ------------: |
+| ATM                | 0.97 ≤ m ≤ 1.03                   |         1,144 |
+| Near-the-money     | 0.94 < m < 0.97 o 1.03 < m < 1.06 |         1,077 |
+| Moderately OTM/ITM | 0.88 < m ≤ 0.94 o 1.06 ≤ m < 1.12 |         1,693 |
+| Deep OTM/ITM       | m < 0.88 o m ≥ 1.12               |         6,238 |
+
+: Distribución de Contratos por Categoría de Moneyness {#tbl-moneyness}
+
+El ranking por RMSE muestra que el modelo GJR-GARCH(1,1,1) con Rolling Window ocupa el primer lugar en las cuatro categorías de moneyness. Esto sugiere que, aunque no fue el mejor modelo en AIC/BIC ni en QLIKE contra varianza realizada, sí entrega el mejor desempeño económico al traducir la volatilidad pronosticada a precios teóricos de opciones. 
+
+| Categoría          | Ranking | Modelo                        |       RMSE |    MAE | MAPE (%) |
+| ------------------ | ------: | ----------------------------- | ---------: | -----: | -------: |
+| ATM                |       1 | GJR-GARCH(1,1) Rolling-Window | 1.0205  | 0.7428 |  22.9105 |
+| ATM                |       2 | APARCH(1,1) Fixed-Window      |     1.0375 | 0.7702 |  23.8484 |
+| ATM                |       3 | APARCH(1,1) Rolling-Window    |     1.0919 | 0.7952 |  24.3419 |
+| Near-the-money     |       1 | GJR-GARCH(1,1) Rolling-Window | 0.8840  | 0.6166 |  55.5501 |
+| Near-the-money     |       2 | APARCH(1,1) Fixed-Window      |     0.9463 | 0.6555 |  57.4330 |
+| Near-the-money     |       3 | APARCH(1,1) Rolling-Window    |     0.9588 | 0.6521 |  62.9452 |
+| Moderately OTM/ITM |       1 | GJR-GARCH(1,1) Rolling-Window | 0.6557  | 0.4175 |  63.9012 |
+| Moderately OTM/ITM |       2 | APARCH(1,1) Rolling-Window    |     0.6967 | 0.4306 |  62.0514 |
+| Moderately OTM/ITM |       3 | APARCH(1,1) Fixed-Window      |     0.6972 | 0.4348 |  65.0278 |
+| Deep OTM/ITM       |       1 | GJR-GARCH(1,1) Rolling-Window |     0.5804 | 0.3443 |  50.6596 |
+| Deep OTM/ITM       |       2 | APARCH(1,1) Rolling-Window    |     0.5834 | 0.3426 |  48.4720 |
+| Deep OTM/ITM       |       3 | EGARCH(1,1) Fixed-Window      |     0.5856 | 0.3442 |  48.7933 |
+
+: Top 3 Modelos por RMSE en cada categoría de moneyness {#tbl-RMSE_moneyness}
+
+La superioridad de GJR-GARCH rolling en pricing sugiere que el efecto asimétrico tipo leverage es especialmente útil cuando la volatilidad se utiliza para valuar opciones. El resultado también muestra que la actualización de parámetros mediante rolling window no necesariamente mejora el pronóstico agregado de varianza, pero sí puede mejorar la capacidad del modelo para generar precios cercanos al mercado.
+
+APARCH aparece de manera consistente entre los primeros lugares, especialmente en las categorías ATM, near-the-money y moderately OTM/ITM. Sin embargo, su ventaja in-sample no se traduce en el primer lugar económico. Este resultado evidencia que la mayor flexibilidad paramétrica mejora el ajuste histórico, pero no garantiza la menor pérdida de pricing.
+
+En la categoría deep OTM/ITM las diferencias entre los mejores modelos son pequeñas. El RMSE del primer lugar es 0.5804, frente a 0.5834 para APARCH rolling y 0.5856 para EGARCH fixed. Esto indica que, en opciones más alejadas del dinero, el ranking es menos contundente y la distancia entre modelos se reduce.
+
+Para evaluar el valor agregado frente a una alternativa clásica, se compara el MAE del mejor modelo económico (GJR-GARCH Rolling) contra el benchmark de volatilidad histórica anualizada con ventana de 252 días y contra el peor modelo global (ARCH Rolling).
+
+| Categoría          | GJR-GARCH Rolling | Volatilidad histórica 252 días | ARCH Rolling |
+| ------------------ | ----------------: | -----------------------------: | -----------: |
+| ATM                |        0.7428 |                         1.3859 |       3.0921 |
+| Near-the-money     |        0.6166 |                         0.9499 |       2.1586 |
+| Moderately OTM/ITM |        0.4175 |                         0.5584 |       1.0536 |
+| Deep OTM/ITM       |        0.3443 |                         0.3503 |       0.3916 |
+
+: Comparación de MAE por Categoría {#tbl-MAE_comparison}
+
+El modelo GJR-GARCH rolling reduce el MAE frente a la volatilidad histórica en todas las categorías. La mejora es mayor en contratos ATM, donde el MAE cae de 1.3859 a 0.7428, una reducción aproximada de 46.4%. En near-the-money la reducción es de 35.1%, y en moderately OTM/ITM es de 25.2%. En deep OTM/ITM la mejora es mucho menor, cercana a 1.7%, lo que indica que la volatilidad histórica simple ya es competitiva para contratos muy alejados del dinero.
+
+Este patrón es financieramente razonable. Las opciones ATM y cercanas al dinero son más sensibles a cambios en volatilidad, por lo que una estimación dinámica de volatilidad tiene mayor capacidad de mejorar el precio teórico. En cambio, para opciones deep OTM/ITM, una parte importante del precio está determinada por el valor intrínseco o por probabilidades de ejercicio muy bajas, de modo que la ganancia marginal de sofisticar el modelo de volatilidad es más limitada.
+
+## Síntesis de Resultados
+Los resultados muestran que la respuesta a la pregunta sobre el “mejor” modelo depende del criterio utilizado. En ajuste in-sample, APARCH(1,1) con distribución Skewed Student-t es el modelo dominante, tanto por AIC como por BIC. En pronóstico estadístico contra varianza realizada, EGARCH(1,1) con ventana fija obtiene el menor QLIKE. En pricing de opciones, el mejor desempeño corresponde a GJR-GARCH(1,1) con rolling window, que alcanza el menor RMSE en las cuatro categorías de moneyness.
+
+La evidencia confirma que no existe una equivalencia automática entre precisión estadística y valor económico. Un modelo puede ajustarse mejor a los retornos históricos o pronosticar mejor la varianza realizada y, aun así, no ser el que minimiza errores de pricing. Esta divergencia es precisamente lo que justifica evaluar los modelos en dos dimensiones: una estadística, centrada en la volatilidad, y otra económica, centrada en precios de opciones.
+
+El resultado más importante desde el punto de vista económico es que las especificaciones asimétricas superan al benchmark histórico y al ARCH simple en la valuación de opciones. GJR-GARCH rolling es especialmente robusto, pues mantiene el primer lugar en RMSE para ATM, near-the-money, moderately OTM/ITM y deep OTM/ITM. La mejora frente a la volatilidad histórica es sustancial en opciones cercanas al dinero, donde la sensibilidad a la volatilidad es mayor, y se reduce en contratos deep OTM/ITM.
+
+En conclusión, los resultados apoyan el uso de modelos GARCH asimétricos para aplicaciones de pricing. APARCH es el modelo más sólido en términos de ajuste in-sample, EGARCH fixed es el más competitivo en pérdida estadística contra varianza realizada, y GJR-GARCH rolling es el modelo con mayor valor económico en la aplicación Black-Scholes del estudio.
 
 # Conclusión
 
