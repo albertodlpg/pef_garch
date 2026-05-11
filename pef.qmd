@@ -1,5 +1,5 @@
 ---
-title: "Comparación de Modelos GARCH para la Predicción de la Volatilidad: Un Estudio Empírico Aplicado al Pricing de Opciones"
+# title: "Comparación de Modelos GARCH para la Predicción de la Volatilidad: Un Estudio Empírico Aplicado al Pricing de Opciones"
 
 format:
     pdf:
@@ -8,12 +8,13 @@ format:
         toc-title: "Índice"
         number-sections: true
         fig-cap-location: bottom
+        fig-pos: 'H'
         df-print: default
 
 editor: visual
 bibliography: refs/references.bib
 csl: refs/apa.csl
-jupyter: python3
+lang: es
 ---
 
 {{< pagebreak >}}
@@ -22,30 +23,61 @@ jupyter: python3
 
 ## Contexto y Relevancia del problema
 
-## Brecha en la literatura
+La volatilidad es una de las variables centrales en los mercados financieros porque resume la incertidumbre asociada al comportamiento futuro de los precios y funciona como un insumo crítico para la gestión de riesgo, la valuación de derivados, la asignación de portafolios y la toma de decisiones de inversión. En contextos de estabilidad, una estimación razonable de la volatilidad permite dimensionar pérdidas potenciales, definir coberturas y valorar instrumentos financieros con mayor precisión. En periodos de estrés como crisis financieras, episodios de alta inflación, shocks geopolíticos o eventos extraordinarios como la pandemia de COVID-19, su relevancia aumenta de forma significativa porque pequeños errores de medición pueden amplificarse en pérdidas económicas relevantes, requerimientos de capital mal calibrados o decisiones estratégicas subóptimas.
+
+El problema adquiere mayor importancia porque la volatilidad no es directamente observable. A diferencia del precio de un activo, que puede observarse en el mercado, la volatilidad debe estimarse a partir de información histórica, precios de derivados o modelos estadísticos. Esta característica introduce un reto metodológico donde distintos modelos pueden generar estimaciones distintas para el mismo activo incluso cuando utilizan la misma información de mercado. Por ello, la elección del modelo de volatilidad no es una decisión puramente técnica, sino una decisión con implicaciones económicas directas.
+
+En el caso de la valuación de opciones, la precisión en la estimación de volatilidad es especialmente relevante. En el modelo Black-Scholes, la volatilidad es el único insumo no observable y tiene un efecto directo sobre el precio teórico del derivado. Una subestimación puede producir precios artificialmente bajos y generar primas insuficientes frente al riesgo asumido. Una sobreestimación puede encarecer las opciones y limitar operaciones potencialmente rentables. En ambos escenarios, el resultado es una asignación ineficiente de recursos y una pérdida de precisión en la medición del valor económico del instrumento.
+
+La literatura financiera ha documentado que los retornos de los activos presentan hechos estilizados incompatibles con una volatilidad constante. Entre estos destacan la presencia de colas pesadas, leptocurtosis, clustering de volatilidad, persistencia, reversión a la media y respuestas asimétricas ante choques positivos y negativos. Estos patrones justifican el uso de modelos de volatilidad condicional, particularmente la familia ARCH/GARCH y sus extensiones, porque permiten que la varianza esperada dependa de información pasada y se ajuste dinámicamente a las condiciones del mercado.
+
+Sin embargo, no existe un consenso absoluto sobre cuál especificación GARCH es superior en todos los contextos. Un modelo puede mostrar buen ajuste dentro de muestra y perder capacidad predictiva fuera de muestra. Otro puede pronosticar adecuadamente la varianza realizada y no generar los mejores precios de opciones. Esta distinción es fundamental porque el objetivo final de un modelo financiero no siempre es minimizar una métrica estadística, sino mejorar una decisión económica concreta. Bajo esta lógica, evaluar modelos de volatilidad únicamente por su ajuste estadístico puede ser insuficiente cuando el uso final es la valuación de derivados.
+
+Este estudio se sitúa precisamente en esa intersección entre precisión estadística y utilidad económica. Al analizar el Dow Jones Industrial Average durante el periodo 2000-2025, el proyecto evalúa si distintos modelos de la familia GARCH no solo capturan la dinámica de la volatilidad del mercado, sino también si sus pronósticos aportan valor tangible al incorporarse en el *pricing* de opciones. De esta forma, el problema de investigación no se limita a identificar qué modelo predice mejor la volatilidad, sino a determinar si esa mejora se traduce en precios de opciones más cercanos a los observados en el mercado. 
 
 ## Preguntas de investigación
 
-En respuesta a los vacíos identificados, este trabajo formula dos preguntas de investigación principales:
-1. ¿Cuál modelo de la familia GARCH, entre ARCH, GARCH, EGARCH, GJR-GARCH y APARCH, ofrece el mejor desempeño predictivo para la volatilidad del DJIA durante el periodo 2000-2025, consierando tanto criterios de ajuste in-sample como métricas de precisión out-of-sample bajo diferentes esquemas de estimación?
-2. ¿En qué medida las mejoras estadísticas, en el pronóstico de la volatilidad, generan valor económico real medido a través de la precisión en pricing de opciones financieras?
+En respuesta a los vacíos identificados, este trabajo formula dos preguntas de investigación principales: 1. ¿Cuál modelo de la familia GARCH, entre ARCH, GARCH, EGARCH, GJR-GARCH y APARCH, ofrece el mejor desempeño predictivo para la volatilidad del DJIA durante el periodo 2000-2025, consierando tanto criterios de ajuste *in-sample* como métricas de precisión *out-of-sample* bajo diferentes esquemas de estimación? 2. ¿En qué medida las mejoras estadísticas, en el pronóstico de la volatilidad, generan valor económico real medido a través de la precisión en *pricing* de opciones financieras?
 
 ## Objetivos
+
 El primer objetivo general responde a la dimensión estadística, mientras que el segundo objetivo general corresponde a la dimensión económica. Cada uno se desglosa en tres objetivos específicos que establecen una progresión lógica desde la estimación hacia la evaluación y de lo estadístico hacia lo económico.
 
-1. Objetivo General 1: Comparar el desempeño predictivo de distintos modelos de la familia GARCH en la estimación y pronóstico de la volatilidad condicional del Dow Jones Industrial Average, evaluando su robustez estadística y estabilidad bajo diferentes condiciones de mercado.
-    * Objetivo Específico 1: Implementar y estimar diferentes especificaciones de la familia GARCH utilizando datos diarios de retornos.
-    * Objetivo Específico 2: Evaluar el desempeño out-of-sample de los modelos mediante métricas de pérdida apropiadas para pronósitcos de volatilidad y pruebas formales de comparación de modeos.
-    * Objetivo Específico 3: Analizar la estabilidad y consistencia del desempeño predictivo de los modelos a nivel individual y agregado bajo distintos regímenes de mercado.
-2. Objetivo General 2: Determinar si el uso de volatilidad pronosticada mediante modelos GARCH genera valor económico medible en aplicaciones financieras de pricing de opciones.
-    * Objetivo Específico 1: Incorporar la volatilidad pronosticada en esquemas de evaluación Black-Scholes para generar precios teóricos de opciones.
-    * Objetivo Específico 2: Comparar los errores de valuación frente a alternativas basadas en volatilidad histórica e implícita.
-    * Objetivo Específico 3: Evaluar el impacto sobre métricas de cobertura.
-
+1.  Objetivo General 1: Comparar el desempeño predictivo de distintos modelos de la familia GARCH en la estimación y pronóstico de la volatilidad condicional del Dow Jones Industrial Average, evaluando su robustez estadística y estabilidad bajo diferentes condiciones de mercado.
+    - Objetivo Específico 1: Implementar y estimar diferentes especificaciones de la familia GARCH utilizando datos diarios de retornos.
+    - Objetivo Específico 2: Evaluar el desempeño *out-of-sample* de los modelos mediante métricas de pérdida apropiadas para pronósitcos de volatilidad y pruebas formales de comparación de modeos.
+    - Objetivo Específico 3: Analizar la estabilidad y consistencia del desempeño predictivo de los modelos a nivel individual y agregado bajo distintos regímenes de mercado.
+2.  Objetivo General 2: Determinar si el uso de volatilidad pronosticada mediante modelos GARCH genera valor económico medible en aplicaciones financieras de *pricing* de opciones.
+    - Objetivo Específico 1: Incorporar la volatilidad pronosticada en esquemas de evaluación Black-Scholes para generar precios teóricos de opciones.
+    - Objetivo Específico 2: Comparar los errores de valuación frente a alternativas basadas en volatilidad histórica e implícita.
 
 ## Contribución del Estudio
 
+La principal contribución de este estudio consiste en integrar, dentro de un mismo marco empírico, la evaluación estadística de modelos de volatilidad y su aplicación económica en la valuación de opciones financieras. En lugar de limitar la comparación a criterios tradicionales de ajuste o a métricas de pronóstico de varianza, el trabajo conecta los modelos GARCH con una aplicación concreta de mercado que corresponde al cálculo de precios teóricos de opciones mediante Black-Scholes utilizando volatilidad pronosticada como insumo. Esto permite evaluar si las mejoras estadísticas realmente generan valor económico medible.
+
+El estudio también contribuye al comparar de forma sistemática cinco especificaciones de la familia GARCH. Las especificaciones analizadas son ARCH(1), GARCH(1,1), EGARCH(1,1), GJR-GARCH(1,1,1) y APARCH(1,1,1). Esta selección permite contrastar modelos simétricos y asimétricos junto con especificaciones con distintos niveles de flexibilidad paramétrica. La inclusión de EGARCH, GJR-GARCH y APARCH permite analizar si capturar efectos de apalancamiento, asimetría y colas pesadas mejora la predicción de volatilidad y el desempeño en *pricing* frente a modelos más simples.
+
+Otra contribución relevante es la comparación entre dos esquemas de estimación que corresponden a ventana fija y ventana móvil. Esta dimensión es importante porque la muestra 2000-2025 incluye episodios de cambio estructural y alta volatilidad como la crisis dot-com, la crisis financiera global, la pandemia de COVID-19 y el periodo posterior de ajuste. Al contrastar ambos esquemas, el estudio evalúa si resulta más conveniente preservar una base histórica amplia o actualizar los parámetros con mayor sensibilidad a la información reciente. Así, la elección de ventana deja de ser un detalle operativo y se convierte en una dimensión central del análisis.
+
+El proyecto aporta además evidencia empírica específica para el Dow Jones Industrial Average, un índice de referencia con características distintas a otros benchmarks ampliamente estudiados. La base de retornos diarios permite construir pronósticos de varianza acumulada a 21 días, horizonte que posteriormente se alinea con la muestra de opciones sobre DJX. Esta consistencia temporal fortalece el vínculo entre la evaluación estadística de volatilidad y la aplicación económica en opciones con vencimiento comparable.
+
+En términos de resultados, el estudio muestra que la selección del “mejor” modelo depende del objetivo de evaluación. APARCH presenta el mejor ajuste *in-sample* bajo AIC y BIC. EGARCH con ventana fija obtiene el mejor desempeño *out-of-sample* frente a varianza realizada bajo QLIKE. GJR-GARCH con ventana móvil genera el menor error de *pricing* en las categorías de *moneyness* analizadas. Esta evidencia contribuye al debate metodológico porque demuestra que precisión estadística y utilidad económica no son equivalentes y que el modelo óptimo debe seleccionarse en función del uso final.
+
+Finalmente, el estudio documenta que incorporar volatilidad condicional dinámica mejora el *pricing* frente al *benchmark* tradicional de volatilidad histórica de 252 días. La reducción del error es particularmente relevante en opciones *at-the-money* y *near-the-money*, donde la sensibilidad del precio a la volatilidad es mayor. Con ello, el trabajo aporta evidencia de que los modelos GARCH no solo capturan regularidades estadísticas de los retornos, sino que también pueden mejorar decisiones financieras concretas cuando se aplican de forma alineada con el horizonte y objetivo económico del instrumento.
+
 ## Estructura del documento
+
+El documento se organiza en siete secciones. La primera sección presenta la introducción del estudio, donde se expone el contexto y la relevancia del problema, se plantean las preguntas de investigación, se definen los objetivos generales y específicos, se establece la contribución del trabajo y se describe la estructura general del documento.
+
+La segunda sección desarrolla la revisión literaria. En ella se abordan los principales hechos estilizados de la volatilidad financiera. Entre ellos se incluyen colas pesadas, clustering, persistencia, reversión a la media y asimetría. Posteriormente se revisan los modelos simétricos ARCH y GARCH junto con las extensiones asimétricas EGARCH, GJR-GARCH y APARCH. También se discuten los criterios de evaluación *in-sample* y *out-of-sample*, los esquemas de estimación mediante ventana fija y ventana móvil, la relación entre precisión estadística y valor económico y la brecha empírica que justifica la aplicación al DJIA.
+
+La tercera sección presenta la metodología. Primero se describe la construcción de la base de datos de retornos diarios del Dow Jones Industrial Average y el cálculo de la varianza realizada a 21 días. Después se justifica estadísticamente el uso de modelos GARCH mediante pruebas de estacionariedad, autocorrelación y dependencia en segundos momentos. Posteriormente se especifican los modelos de volatilidad utilizados, los esquemas de estimación, la generación de pronósticos de varianza acumulada y la métrica QLIKE para evaluación estadística. Finalmente, se detalla la aplicación financiera mediante Black-Scholes, la conversión de pronósticos GARCH a volatilidad anualizada, el *benchmark* de volatilidad histórica, la base de opciones DJX y las métricas de error en *pricing*.
+
+La cuarta sección reporta los resultados empíricos. En primer lugar, se presenta la evidencia descriptiva inicial de los retornos del DJIA incluyendo estadísticos, distribución empírica, pruebas de diagnóstico y evidencia visual de clustering de volatilidad. Después se muestran los resultados *in-sample* bajo criterios AIC y BIC seguidos por la evaluación *out-of-sample* de pronósticos de varianza mediante QLIKE. La sección cierra con la aplicación económica al *pricing* de opciones, donde se comparan los errores de valuación por categoría de *moneyness* y se evalúa el desempeño de los modelos frente al *benchmark* de volatilidad histórica.
+
+La quinta sección presenta las conclusiones del estudio. En esta parte se sintetizan los principales hallazgos, se discute la diferencia entre desempeño estadístico y desempeño económico, se interpreta la superioridad de GJR-GARCH con ventana móvil en *pricing* de opciones y se señalan las limitaciones del trabajo. También se proponen líneas futuras de investigación que incluyen la extensión del análisis a otros activos, otros mercados, distintos vencimientos, métricas de cobertura y modelos de *pricing* que incorporen directamente dinámicas GARCH bajo una medida neutral al riesgo.
+
+La sexta sección contiene la bibliografía utilizada, incluyendo las referencias fundamentales sobre modelos ARCH/GARCH, hechos estilizados de volatilidad, evaluación de pronósticos, selección de ventanas, modelos de *pricing* de opciones y aplicaciones empíricas relacionadas. Finalmente, la séptima sección incluye los apéndices, donde se presentan gráficos complementarios de errores en los pronósticos de varianza realizada y diagnósticos de dispersión relativa entre varianza pronosticada y varianza realizada para cada modelo y esquema de estimación.
 
 # Revisión Literaria
 
@@ -71,7 +103,7 @@ En conjunto, estos hechos estilizados constituyen el fundamento empírico para m
 
 Bajo este marco, la pregunta ya no es si la volatilidad es dinámica, sino cómo parametrizar esa dinámica de forma consistente con la evidencia empírica. Para ello, @engle1982autoregressive introduce el modelo *Autoregressive Conditional Heteroskedasticity* (ARCH), cuya premisa central es que la varianza condicional en el período $t$ depende de los cuadrados de los errores pasados, reproduciendo el *clustering* de volatilidad documentado por @mandelbrot1963variation y @fama1965behavior. Sin embargo, suele presentar problemas de parsimonía en muestras finitas ya que para capturar la persistencia de la volatilidad observada se requiere un número elevado de rezagos. @bollerslev1986generalized aborda este problema al proponer el *Generalized ARCH* (GARCH), que incorpora rezagos de la propia varianza condicional, logrando capturar esa misma persistencia con tan solo tres parámetros que captan el nivel, la reacción a los choques y la persistencia: $\omega$ (omega), $\alpha$ (alpha) y $\beta$ (beta).
 
-La solidez empírica del GARCH(1,1) como especificación de referencia está respaldada por la literatura de los últimos años, @hansen2005forecast comparan 330 modelos de la familia ARCH en su *survey*, y concluyen que es notablemente difícil de superar cuando el criterio de evaluación es estadístico. Por ello, se incluye como benchmark natural en la comparación de este estudio.
+La solidez empírica del GARCH(1,1) como especificación de referencia está respaldada por la literatura de los últimos años, @hansen2005forecast comparan 330 modelos de la familia ARCH en su *survey*, y concluyen que es notablemente difícil de superar cuando el criterio de evaluación es estadístico. Por ello, se incluye como *benchmark* natural en la comparación de este estudio.
 
 No obstante, tanto el ARCH como el GARCH comparten una limitación estructural fundamental: su especificación es simétrica. En ambos modelos, el impacto de un choque sobre la varianza condicional depende únicamente de su magnitud y no de su dirección, de modo que, un choque negativo y uno positivo de igual magnitud generan exactamente el mismo incremento en la volatilidad condicional. Esta limitante es insostenible en los mercados de renta variable; ya que como @christie1982stochastic documenta, los choques negativos generan incrementos de volatilidad sistemáticamente mayores que los positivos de igual magnitud.
 
@@ -85,9 +117,9 @@ Superar la limitante de simetría exige modelos que distingan entre el signo y l
 
 La especificación más flexible de las tres es el modelo *Asymmetric Power ARCH* (APARCH), introducido por @ding1993long. El modelo APARCH generaliza simultáneamente el tratamiento de la asimetría y la potencia sobre la cual se mide la varianza condicional ya que, en lugar de modelar la varianza condicional directamente, modela una potencia flexible $\delta$ de la desviación estándar condicional, donde $\delta$ es un parámetro adicional estimado a partir de los datos. @fernandez1998bayesian complementan esta especificación al formalizar la distribución *Skewed Student-t* utilizada en la estimación del modelo APARCH, demostrando que es necesario capturar asimetría en la distribución de los errores además de la asimetría en la ecuación de varianza. Por su parte, @hansen1994autoregressive desarrolla un marco más general de estimación de densidades condicionales que permite que los parámetros de forma de la distribución varíen en función de la información disponible en cada período. Su propuesta de una distribución *Student-t* sesgada con parámetros dinámicos ofrece una alternativa que captura simultáneamente la no normalidad y la asimetría temporal de los errores, siendo metodológicamente compatible con las especificaciones APARCH estimadas en dicho estudio.
 
-Posteriormente, @christoffersen2006option validan la relevancia de este enfoque al demostrar que capturar asimetría distribucional mejora el pricing de opciones más allá de lo que captura el efecto leverage en la ecuación de varianza, conectando directamente las propiedades del APARCH con el objetivo económico de esta investigación.
+Posteriormente, @christoffersen2006option validan la relevancia de este enfoque al demostrar que capturar asimetría distribucional mejora el *pricing* de opciones más allá de lo que captura el efecto leverage en la ecuación de varianza, conectando directamente las propiedades del APARCH con el objetivo económico de esta investigación.
 
-## Evaluación estadística: in-sample y out-of-sample
+## Evaluación estadística: *in-sample* y *out-of-sample*
 
 Determinar cuál de estos modelos produce los pronósticos más precisos exige separar el ajuste sobre los datos de estimación y la capacidad predictiva sobre datos no vistos. En su revisión de más de noventa y tres estudios sobre pronóstico de volatilidad, @poon2003forecasting documentan que la superioridad de un modelo en ajuste *in-sample* no constituye evidencia suficiente de su superioridad predictiva fuera de muestra. Este resultado tiene la consecuencia metodológica de que un modelo más complejo como el APARCH puede superar al GARCH(1,1) en criterios AIC y BIC sobre los datos de entrenamiento y, no obstante, generar pronósticos *out-of-sample* inferiores debido a sobreajuste.
 
@@ -97,7 +129,7 @@ La evaluación *in-sample* se realiza a través de criterios de información que
 
 Sin embargo, es importante distinguir que la limitación del RMSE identificada por @patton2011volatility aplica exclusivamente en la evaluación estadística *out-of-sample* con proxy imperfecto de volatilidad. Bajo este contexto, @hansen2005forecast corroboran que el uso de métricas como el RMSE puede producir rankings inconsistentes entre modelos de volatilidad no observable.
 
-Por otra parte, la evaluación de modelos GARCH en el contexto de pricing de opciones no debe limitarse al desempeño estadístico de la predicción de volatilidad. @christoffersen2004importance muestran que los modelos favorecidos por criterios basados en retornos o *likelihood* no necesariamente son los que mejor funcionan cuando se evalúan en pricing de opciones, es decir, un modelo puede minimizar el error de predicción de volatilidad y, aun así, no minimizar el error de pricing. Esta conclusión es relevante para esta investigación ya que comparar modelos GARCH sólo con métricas estadísticas de volatilidad captura una dimensión incompleta del problema. Para resolver esto, y considerando que el precio de mercado es directamente observable, el uso de métricas de error como el RMSE, MAE y MAPE son válidas y apropiadas para comparar el desempeño de los modelos en esta dimensión específica.
+Por otra parte, la evaluación de modelos GARCH en el contexto de *pricing* de opciones no debe limitarse al desempeño estadístico de la predicción de volatilidad. @christoffersen2004importance muestran que los modelos favorecidos por criterios basados en retornos o *likelihood* no necesariamente son los que mejor funcionan cuando se evalúan en *pricing* de opciones, es decir, un modelo puede minimizar el error de predicción de volatilidad y, aun así, no minimizar el error de *pricing*. Esta conclusión es relevante para esta investigación ya que comparar modelos GARCH sólo con métricas estadísticas de volatilidad captura una dimensión incompleta del problema. Para resolver esto, y considerando que el precio de mercado es directamente observable, el uso de métricas de error como el RMSE y MAE son válidas y apropiadas para comparar el desempeño de los modelos en esta dimensión específica.
 
 ## Esquemas de estimación: ventana fija y ventana móvil
 
@@ -121,47 +153,41 @@ La conexión entre los modelos de volatilidad condicional y la valuación de opc
 
 @hull1987pricing muestran que, cuando la volatilidad es estocástica e independiente del precio del activo, el precio correcto de la opción puede interpretarse como el valor esperado del precio Black-Scholes integrado sobre la distribución de la varianza promedio durante la vida del contrato. Además, analizan procedimientos numéricos y simulaciones Monte Carlo para aproximar el valor de la opción cuando no existe una solución simple. Su resultado también matiza los sesgos de Black-Scholes, esto es que el modelo tiende a sobrevaluar opciones *at-the-money* y a subvaluar opciones suficientemente *deep in-the-money* o *deep out-of-the-money*, con efectos que dependen del tiempo al vencimiento. Aunque Hull & White no estiman modelos GARCH, su contribución respalda la idea de que la volatilidad relevante para una opción debe vincularse al comportamiento esperado de la varianza durante la vida del contrato.
 
-Complementariamente, @brooks2003volatility formalizan la construcción de pronósticos de volatilidad para horizontes de varios días, su propuesta consiste en generar pronósticos de varianza condicional para cada periodo futuro y agregarlos mediante la suma de dichas varianzas, ya que la varianza es aditiva en el tiempo. Este resultado es relevante para la valuación de opciones porque el parámetro de volatilidad no debe representar únicamente el riesgo del siguiente día, sino la incertidumbre esperada durante el horizonte completo del contrato. Por ello, el uso de varianza acumulada permite construir un input de volatilidad consistente con el vencimiento de la opción y evita extrapolar mecánicamente un pronóstico de un día hacia horizontes más largos.
+Complementariamente, @brooks2003volatility formalizan la construcción de pronósticos de volatilidad para horizontes de varios días, su propuesta consiste en generar pronósticos de varianza condicional para cada periodo futuro y agregarlos mediante la suma de dichas varianzas, ya que la varianza es aditiva en el tiempo. Este resultado es relevante para la valuación de opciones porque el parámetro de volatilidad no debe representar únicamente el riesgo del siguiente día, sino la incertidumbre esperada durante el horizonte completo del contrato. Por ello, el uso de varianza acumulada permite construir un *input* de volatilidad consistente con el vencimiento de la opción y evita extrapolar mecánicamente un pronóstico de un día hacia horizontes más largos.
 
-Desde esta perspectiva, la incorporación de volatilidad pronosticada mediante modelos GARCH puede interpretarse como una adaptación empírica del marco Black-Scholes. Esta adaptación metodológica se presenta en dos enfoques distintos, el enfoque *plug-in* y los modelos formales de *option pricing* bajo GARCH. En lugar de asumir una volatilidad constante o utilizar una estimación histórica fija, el enfoque *plug-in* sustituye ese parámetro por una predicción de varianza condicional generada por un modelo GARCH. En los modelos formales, en cambio, la dinámica de la varianza forma parte del modelo de valuación bajo una medida de pricing o medida neutral al riesgo, como ocurre en @duan1995garch, quien formaliza el pricing de opciones cuando los retornos del subyacente siguen un proceso GARCH mediante la *locally risk-neutral valuation relationship*. Esta medida permite valuar el derivado descontando sus pagos esperados a la tasa libre de riesgo. El presente estudio se ubica en el primer enfoque, donde se estiman modelos de la familia GARCH con datos históricos de retornos, se generan predicciones de varianza y dichas predicciones se usan como insumo para calcular precios de opciones mediante Black-Scholes.
+Desde esta perspectiva, la incorporación de volatilidad pronosticada mediante modelos GARCH puede interpretarse como una adaptación empírica del marco Black-Scholes. Esta adaptación metodológica se presenta en dos enfoques distintos, el enfoque *plug-in* y los modelos formales de *option pricing* bajo GARCH. En lugar de asumir una volatilidad constante o utilizar una estimación histórica fija, el enfoque *plug-in* sustituye ese parámetro por una predicción de varianza condicional generada por un modelo GARCH. En los modelos formales, en cambio, la dinámica de la varianza forma parte del modelo de valuación bajo una medida de *pricing* o medida neutral al riesgo, como ocurre en @duan1995garch, quien formaliza el *pricing* de opciones cuando los retornos del subyacente siguen un proceso GARCH mediante la *locally risk-neutral valuation relationship*. Esta medida permite valuar el derivado descontando sus pagos esperados a la tasa libre de riesgo. El presente estudio se ubica en el primer enfoque, donde se estiman modelos de la familia GARCH con datos históricos de retornos, se generan predicciones de varianza y dichas predicciones se usan como insumo para calcular precios de opciones mediante Black-Scholes.
 
-Esta lógica es consistente con @bi2014study, quienes proponen utilizar GARCH(1,1) para obtener una medida de volatilidad que posteriormente se introduce en el modelo Black-Scholes. Su contribución es útil porque muestra una implementación parsimoniosa del acoplamiento GARCH-BS. No obstante, su alcance es limitado frente a los objetivos de este estudio. Al apoyarse en una medida de volatilidad de largo plazo, el enfoque sacrifica información sobre la estructura temporal específica del vencimiento de la opción. Además, se restringe a una sola especificación GARCH(1,1), por lo que no permite evaluar si modelos con asimetría o efectos de apalancamiento generan mejores resultados de pricing. Frente a ello, el presente estudio compara varias especificaciones de la familia GARCH y utiliza pronósticos de varianza asociados al horizonte relevante de valuación, en lugar de reemplazar la dinámica futura por un único parámetro de estado estacionario.
+Esta lógica es consistente con @bi2014study, quienes proponen utilizar GARCH(1,1) para obtener una medida de volatilidad que posteriormente se introduce en el modelo Black-Scholes. Su contribución es útil porque muestra una implementación parsimoniosa del acoplamiento GARCH-BS. No obstante, su alcance es limitado frente a los objetivos de este estudio. Al apoyarse en una medida de volatilidad de largo plazo, el enfoque sacrifica información sobre la estructura temporal específica del vencimiento de la opción. Además, se restringe a una sola especificación GARCH(1,1), por lo que no permite evaluar si modelos con asimetría o efectos de apalancamiento generan mejores resultados de *pricing*. Frente a ello, el presente estudio compara varias especificaciones de la familia GARCH y utiliza pronósticos de varianza asociados al horizonte relevante de valuación, en lugar de reemplazar la dinámica futura por un único parámetro de estado estacionario.
 
 En su estudio, @tong2023enhancing busca mejorar la precisión del modelo Black-Scholes mediante una revisión explícita del supuesto de volatilidad constante. Para ello, utiliza simulaciones Monte Carlo para simular trayectorias bajo Black-Scholes usando volatilidad implícita constante y después calibra un GARCH(1,1) con datos históricos para generar una volatilidad iterativa paso a paso dentro del mismo marco de simulación. Los precios obtenidos se comparan con precios de mercado mediante RMSE, y el autor reporta una mejora moderada al incorporar GARCH. Sin embargo, también deja espacios abiertos, ya que compara sólo una especificación GARCH(1,1) y no analiza la sensibilidad del resultado a distintas familias GARCH o esquemas de estimación.
 
-Finalmente, es importante reconocer que los errores de valuación no son homogéneos entre contratos. @christoffersen2004importance evalúan modelos GARCH considerando diferencias por *moneyness* y *maturity*, y reportan que el desempeño de un modelo puede variar según la posición de la opción con respecto al subyacente y el tiempo restante al vencimiento. Esto exige que la evaluación económica de los modelos GARCH aplicados a pricing deba considerar cómo los errores se distribuyen entre contratos con distintas características.
+Finalmente, es importante reconocer que los errores de valuación no son homogéneos entre contratos. @christoffersen2004importance evalúan modelos GARCH considerando diferencias por *moneyness* y *maturity*, y reportan que el desempeño de un modelo puede variar según la posición de la opción con respecto al subyacente y el tiempo restante al vencimiento. Esto exige que la evaluación económica de los modelos GARCH aplicados a *pricing* deba considerar cómo los errores se distribuyen entre contratos con distintas características.
 
 ## Evidencia empírica del DJIA y brecha identificada
 
-La evidencia empírica sobre el pronóstico de volatilidad mediante modelos GARCH se ha concentrado principalmente en índices amplios y activos financieros de referencia. Hansen y Lunde (2005) comparan un amplio conjunto de especificaciones ARCH y encuentran que el GARCH(1,1) mantiene un desempeño sólido como modelo base, aunque ciertas especificaciones asimétricas pueden aportar mejoras en series de renta variable. Esta evidencia abre la necesidad de evaluar si dichos beneficios se mantienen en índices con una composición y metodología distintas, como el DJIA. Por su parte, Christoffersen y Jacobs (2004) vinculan los pronósticos de volatilidad GARCH con el pricing de opciones sobre el S&P 500, estableciendo una referencia metodológica para evaluar el valor económico de estos modelos. En conjunto, estos estudios muestran que la evaluación de modelos GARCH ha sido ampliamente desarrollada en activos de referencia, pero no necesariamente en índices con estructuras distintas, como el DJIA.
-
-El DJIA presenta características que justifican un análisis específico. A diferencia del S&P 500, que es un índice ponderado por capitalización y compuesto por 500 empresas, el DJIA es un índice ponderado por precio integrado por únicamente 30 compañías de alta capitalización. Esta estructura puede generar una dinámica de volatilidad distinta. En este sentido, Andersen et al. (2001), al analizar acciones constitutivas del DJIA, documentan propiedades como dependencia temporal, asimetría y persistencia en la volatilidad, lo que refuerza la necesidad de evidencia empírica específica sobre este índice.
+La evidencia empírica sobre el pronóstico de volatilidad mediante modelos GARCH se ha concentrado principalmente en índices amplios y activos financieros de referencia. Hansen y Lunde (2005) comparan un amplio conjunto de especificaciones ARCH y encuentran que el GARCH(1,1) mantiene un desempeño sólido como modelo base, aunque ciertas especificaciones asimétricas pueden aportar mejoras en series de renta variable. Esta evidencia abre la necesidad de evaluar si dichos beneficios se mantienen en índices con una composición y metodología distintas, como el DJIA. Por su parte, Christoffersen y Jacobs (2004) vinculan los pronósticos de volatilidad GARCH con el *pricing* de opciones sobre el S&P 500, estableciendo una referencia metodológica para evaluar el valor económico de estos modelos. En conjunto, estos estudios muestran que la evaluación de modelos GARCH ha sido ampliamente desarrollada en activos de referencia, pero no necesariamente en índices con estructuras distintas, como el DJIA.
 
 Además, la literatura comparativa presenta limitaciones metodológicas relevantes. Aunque especificaciones como EGARCH, GJR-GARCH y APARCH permiten capturar efectos asimétricos y leverage, no existe consenso claro sobre cuál modelo domina de manera robusta. Asimismo, muchos estudios adoptan un único esquema de estimación, ya sea ventana fija o ventana móvil, sin contrastar ambos dentro del mismo marco empírico. Finalmente, la evaluación suele concentrarse en métricas estadísticas, aun cuando la métrica utilizada puede alterar el ranking entre modelos (Patton, 2011) y la evaluación estadística no necesariamente coincide con la evaluación económica (Christoffersen y Jacobs, 2004).
 
-Ante estas limitaciones, este estudio desarrolla un marco comparativo aplicado al DJIA durante el periodo 2000–2025. El análisis evalúa cinco modelos GARCH bajo esquemas de ventana fija y rolling, e integra dentro de un mismo diseño empírico la evaluación estadística del pronóstico de volatilidad y su relevancia económica en el pricing de derivados.
+Ante estas limitaciones, este estudio desarrolla un marco comparativo aplicado al DJIA durante el periodo 2000–2025. El análisis evalúa cinco modelos GARCH bajo esquemas de ventana fija y rolling, e integra dentro de un mismo diseño empírico la evaluación estadística del pronóstico de volatilidad y su relevancia económica en el *pricing* de derivados.
 
 # Metodología
 
-La metodología del estudio se construye para conectar la evidencia estadística de volatilidad condicional con una aplicación económica de valuación de opciones. La primera parte estima modelos de la familia ARCH sobre retornos diarios del DJIA y genera pronósticos de varianza acumulada a 21 días. La segunda parte transforma esos pronósticos en volatilidad anualizada y los utiliza como input del modelo Black-Scholes para calcular precios teóricos de opciones europeas. Esta estructura sigue la lógica de la revisión literaria, donde la volatilidad dinámica se justifica por hechos estilizados y la evaluación se separa entre precisión estadística y valor económico. 
+La metodología del estudio se construye para conectar la evidencia estadística de volatilidad condicional con una aplicación económica de valuación de opciones. La primera parte estima modelos de la familia ARCH sobre retornos diarios del DJIA y genera pronósticos de varianza acumulada a 21 días. La segunda parte transforma esos pronósticos en volatilidad anualizada y los utiliza como *input* del modelo Black-Scholes para calcular precios teóricos de opciones europeas. Esta estructura sigue la lógica de la revisión literaria, donde la volatilidad dinámica se justifica por hechos estilizados y la evaluación se separa entre precisión estadística y valor económico.
 
 ## Datos y construcción de la serie de retornos
 
-El activo subyacente utilizado para la estimación de los modelos de volatilidad es el Dow Jones Industrial Average, identificado en `yfinance` mediante el ticker `^DJI`. La base de datos se construye a partir de precios de cierre ajustados diarios descargados desde el 1 de enero de 2000 hasta el 31 de diciembre de 2025. Después de calcular retornos logarítmicos y eliminar la primera observación vacía, la muestra efectiva de retornos inicia el 4 de enero de 2000 y termina el 30 de diciembre de 2025, con un total de 6537 observaciones diarias.
+El activo subyacente utilizado para la estimación de los modelos de volatilidad es el Dow Jones Industrial Average, identificado en `yfinance` mediante el *ticker* `^DJI`. La base de datos se construye a partir de precios de cierre ajustados diarios descargados desde el 1 de enero de 2000 hasta el 31 de diciembre de 2025. Después de calcular retornos logarítmicos y eliminar la primera observación vacía, la muestra efectiva de retornos inicia el 4 de enero de 2000 y termina el 30 de diciembre de 2025, con un total de 6537 observaciones diarias.
 
 Sea $P_t$ el precio de cierre ajustado del índice en el día $t$. El retorno logarítmico diario se define como:
 
-$$
-r_t = 100\times\ln\frac{P_t}{P_{t-1}}
-$$
+$$r_t = 100\times\ln\frac{P_t}{P_{t-1}}$$
 
 La multiplicación por $100$ expresa los retornos en porcentaje, lo cual facilita la estimación numérica de los modelos ARCH y GARCH mediante la librería `arch`. Bajo esta convención, la varianza condicional estimada por los modelos se interpreta en unidades de porcentaje al cuadrado.
 
 Para evaluar los pronósticos de volatilidad se construye un proxy de varianza realizada a 21 días hábiles. Este horizonte se selecciona porque aproxima un mes de negociación y coincide con el vencimiento utilizado posteriormente en la aplicación de opciones. Para cada fecha de pronóstico $\tau$, la varianza realizada se calcula como la suma de retornos cuadrados durante el horizonte de evaluación.
 
-$$
-RV_{\tau,21} = \sum_{j=1}^{21} r_{\tau+j}^{2}
-$$
+$$RV_{\tau,21} = \sum_{j=1}^{21} r_{\tau+j}^{2}$$
 
 El objeto que se pronostica no es la volatilidad diaria aislada, sino la varianza acumulada durante el horizonte relevante para la opción. Esto permite que la evaluación estadística de los modelos y la conversión posterior a volatilidad anualizada mantengan consistencia temporal.
 
@@ -204,13 +230,9 @@ Bajo este marco, las pruebas estadísticas no se utilizan como resultados finale
 
 La estimación parte de una ecuación general de media y una ecuación de varianza condicional. Para los modelos GARCH, EGARCH, GJR-GARCH y APARCH se utiliza una media AR 1. Para el modelo ARCH se utiliza media constante que sirve como un modelo base para la comparativa. La estructura general de los modelos se escribe como:
 
-$$
-r_t = \mu + \phi r_{t-1} + \epsilon_t
-$$
+$$r_t = \mu + \phi r_{t-1} + \epsilon_t$$
 
-$$
-\epsilon_t = \sigma_t z_t
-$$
+$$\epsilon_t = \sigma_t z_t$$
 
 $$
 E\left[z_t\right]=0,
@@ -236,7 +258,7 @@ donde $f_D$ representa la densidad de la distribución asumida para $z_t$ y $\ps
 
 El modelo ARCH introducido por @engle1982autoregressive permite que la varianza condicional dependa del choque cuadrático del periodo anterior. Su intuición es directa: si el mercado experimentó un movimiento grande ayer, positivo o negativo, el riesgo esperado para hoy aumenta. Esta especificación captura *volatility clustering* en su forma más simple y sirve como punto de partida para modelos más persistentes.
 
-$$
+$$|
 r_t = \mu + \epsilon_t
 $$
 
@@ -248,21 +270,21 @@ $$
 \sigma_t^2 = \omega + \alpha \epsilon_{t-1}^{2}
 $$
 
-| Variable     | Definición                                                     |
-| ------------ | -------------------------------------------------------------- |
-| $r_t$        | retorno logarítmico diario en porcentaje                       |
-| $\mu$        | media condicional constante                                    |
-| $\epsilon_t$ | innovación no esperada del retorno                             |
-| $\sigma_t^2$ | varianza condicional del retorno                               |
-| $z_t$        | innovación estandarizada con media cero y varianza unitaria    |
-| $\omega$     | componente constante de la varianza                            |
-| $\alpha$     | sensibilidad de la varianza ante el choque cuadrático rezagado |
+| Variable | Definición |
+|-----------------------|-------------------------------------------------|
+| $r_t$ | retorno logarítmico diario en porcentaje |
+| $\mu$ | media condicional constante |
+| $\epsilon_t$ | innovación no esperada del retorno |
+| $\sigma_t^2$ | varianza condicional del retorno |
+| $z_t$ | innovación estandarizada con media cero y varianza unitaria |
+| $\omega$ | componente constante de la varianza |
+| $\alpha$ | sensibilidad de la varianza ante el choque cuadrático rezagado |
 
 El parámetro $\omega$ representa el nivel base de la varianza condicional, mientras que $\alpha_1$ mide la reacción inmediata del riesgo ante nueva información. La principal limitación del ARCH (1) es su baja capacidad para capturar persistencia prolongada, ya que la varianza depende únicamente del último choque observado. Como señalan @bollerslev1992arch, una especificación ARCH puede requerir muchos rezagos para reproducir la persistencia empírica de la volatilidad financiera.
 
 ### GARCH (1,1)
 
-El modelo GARCH propuesto por @bollerslev1986generalized extiende ARCH al incorporar rezagos de la propia varianza condicional. De esta forma, la volatilidad esperada depende tanto de nueva información como de la volatilidad previamente estimada. Esta combinación permite capturar persistencia con una especificación parsimoniosa, motivo por el cual @hansen2005forecast lo consideran un benchmark difícil de superar en evaluación estadística.
+El modelo GARCH propuesto por @bollerslev1986generalized extiende ARCH al incorporar rezagos de la propia varianza condicional. De esta forma, la volatilidad esperada depende tanto de nueva información como de la volatilidad previamente estimada. Esta combinación permite capturar persistencia con una especificación parsimoniosa, motivo por el cual @hansen2005forecast lo consideran un *benchmark* difícil de superar en evaluación estadística.
 
 $$
 r_t = \mu + \phi r_{t-1} + \epsilon_t
@@ -277,7 +299,7 @@ $$
 $$
 
 | Variable     | Definición                                     |
-| ------------ | ---------------------------------------------- |
+|--------------|------------------------------------------------|
 | $r_t$        | retorno logarítmico diario en porcentaje       |
 | $\mu$        | constante de la ecuación de media              |
 | $\phi$       | coeficiente autorregresivo de la media         |
@@ -285,8 +307,8 @@ $$
 | $\sigma_t^2$ | varianza condicional                           |
 | $z_t$        | innovación estandarizada                       |
 | $\omega$     | nivel base de varianza                         |
-| $\alpha$   | reacción de la varianza ante choques recientes |
-| $\beta$    | persistencia de la varianza condicional        |
+| $\alpha$     | reacción de la varianza ante choques recientes |
+| $\beta$      | persistencia de la varianza condicional        |
 
 El parámetro $\alpha$ captura la reacción de corto plazo ante nueva información, mientras que $\beta$ captura la memoria del proceso de volatilidad. La suma $\alpha+\beta$ suele interpretarse como una medida de persistencia. La condición usual de estacionariedad en covarianza se expresa como
 
@@ -312,18 +334,17 @@ $$
 \log\sigma_t^2 = \omega + \alpha \left(\left|z_{t-1}\right| - E\left[\left|z_{t-1}\right|\right]\right) + \beta \log\sigma_{t-1}^2
 $$
 
-
-| Variable     | Definición                                                        |
-| ------------ | ----------------------------------------------------------------- |
-| $r_t$        | retorno logarítmico diario en porcentaje                          |
-| $\mu$        | constante de la ecuación de media                                 |
-| $\phi$       | coeficiente autorregresivo de la media                            |
-| $\epsilon_t$ | innovación no esperada del retorno                                |
-| $\sigma_t^2$ | varianza condicional                                              |
-| $z_t$        | innovación estandarizada                                          |
-| $\omega$     | nivel base del logaritmo de la varianza                           |
-| $\alpha$   | reacción del logaritmo de la varianza ante la magnitud del choque |
-| $\beta$    | persistencia del logaritmo de la varianza                         |
+| Variable | Definición |
+|----------------------|--------------------------------------------------|
+| $r_t$ | retorno logarítmico diario en porcentaje |
+| $\mu$ | constante de la ecuación de media |
+| $\phi$ | coeficiente autorregresivo de la media |
+| $\epsilon_t$ | innovación no esperada del retorno |
+| $\sigma_t^2$ | varianza condicional |
+| $z_t$ | innovación estandarizada |
+| $\omega$ | nivel base del logaritmo de la varianza |
+| $\alpha$ | reacción del logaritmo de la varianza ante la magnitud del choque |
+| $\beta$ | persistencia del logaritmo de la varianza |
 
 El componente $\left|z_{t-1}\right|-E\left[\left|z_{t-1}\right|\right]$ mide si la magnitud del choque fue mayor o menor a su valor esperado. La ventaja metodológica del EGARCH es que evita restricciones de positividad y permite una dinámica multiplicativa de la varianza. Adicionalmente, su formulación en logaritmos favorece una estimación más estable y parsimoniosa, lo que facilita la comparabilidad empírica con otras especificaciones de la familia GARCH sin incurrir en sobreparametrización.
 
@@ -355,19 +376,19 @@ I_{t-1}^{-}
 = \mathbf{1}_{\left\{\epsilon_{t-1}<0\right\}}
 $$
 
-| Variable      | Definición                                                                 |
-| ------------- | -------------------------------------------------------------------------- |
-| $r_t$         | retorno logarítmico diario en porcentaje                                   |
-| $\mu$         | constante de la ecuación de media                                          |
-| $\phi$        | coeficiente autorregresivo de la media                                     |
-| $\epsilon_t$  | innovación no esperada del retorno                                         |
-| $\sigma_t^2$  | varianza condicional                                                       |
-| $z_t$         | innovación estandarizada                                                   |
-| $\omega$      | componente constante de la varianza                                        |
-| $\alpha$    | efecto de choques positivos y negativos en ausencia del término asimétrico |
-| $\gamma$    | efecto adicional asociado a choques negativos                              |
-| $I_{t-1}^{-}$ | indicador que toma valor uno cuando el choque rezagado es negativo         |
-| $\beta$     | persistencia de la varianza condicional                                    |
+| Variable | Definición |
+|----------------------|--------------------------------------------------|
+| $r_t$ | retorno logarítmico diario en porcentaje |
+| $\mu$ | constante de la ecuación de media |
+| $\phi$ | coeficiente autorregresivo de la media |
+| $\epsilon_t$ | innovación no esperada del retorno |
+| $\sigma_t^2$ | varianza condicional |
+| $z_t$ | innovación estandarizada |
+| $\omega$ | componente constante de la varianza |
+| $\alpha$ | efecto de choques positivos y negativos en ausencia del término asimétrico |
+| $\gamma$ | efecto adicional asociado a choques negativos |
+| $I_{t-1}^{-}$ | indicador que toma valor uno cuando el choque rezagado es negativo |
+| $\beta$ | persistencia de la varianza condicional |
 
 Cuando $\epsilon_{t-1}$ es positivo, el efecto del choque sobre la varianza es $\alpha\epsilon_{t-1}^{2}$. Cuando $\epsilon_{t-1}$ es negativo, el efecto total es $\left(\alpha+\gamma\right)\epsilon_{t-1}^{2}$. La condición $\gamma>0$ implica que las malas noticias aumentan la volatilidad más que las buenas noticias de igual magnitud. La limitación del modelo es que la asimetría se introduce mediante un umbral discreto, por lo que la respuesta cambia únicamente al cruzar el signo cero.
 
@@ -396,7 +417,7 @@ $$
 $$
 
 | Variable     | Definición                                              |
-| ------------ | ------------------------------------------------------- |
+|--------------|---------------------------------------------------------|
 | $r_t$        | retorno logarítmico diario en porcentaje                |
 | $\mu$        | constante de la ecuación de media                       |
 | $\phi$       | coeficiente autorregresivo de la media                  |
@@ -405,9 +426,9 @@ $$
 | $\delta$     | potencia estimada de la desviación estándar condicional |
 | $z_t$        | innovación estandarizada                                |
 | $\omega$     | componente constante                                    |
-| $\alpha$   | reacción ante choques rezagados ajustados por asimetría |
-| $\gamma$   | parámetro de asimetría en la respuesta a choques        |
-| $\beta$    | persistencia de la volatilidad transformada             |
+| $\alpha$     | reacción ante choques rezagados ajustados por asimetría |
+| $\gamma$     | parámetro de asimetría en la respuesta a choques        |
+| $\beta$      | persistencia de la volatilidad transformada             |
 | $\nu$        | grados de libertad de la distribución Skewed Student-t  |
 | $\lambda$    | parámetro de sesgo de la distribución Skewed Student-t  |
 
@@ -417,9 +438,9 @@ El parámetro $\delta$ permite que la dinámica de la volatilidad sea determinad
 
 La comparación de modelos se realiza bajo dos esquemas de estimación. Esta decisión responde a la discusión de @stock1996evidence, @pesaran2007selection, @inoue2017rolling y @marcucci2005forecasting sobre inestabilidad paramétrica, selección de ventanas y posibles cambios de régimen. En particular, la muestra 2000-2025 incluye episodios de alta volatilidad como la crisis *dot-com*, la crisis financiera global, el COVID-19 y el ajuste posterior a la pandemia. Por ello, el estudio compara una estrategia que favorece estabilidad paramétrica con otra que privilegia adaptación a información reciente.
 
-### Fixed Window
+### *Fixed Window*
 
-En el esquema Fixed Window, los parámetros se estiman una sola vez utilizando información disponible hasta el 31 de diciembre de 2017. La muestra de entrenamiento inicia con el primer retorno efectivo, correspondiente al 4 de enero de 2000, y se mantiene fija para todo el periodo de evaluación. Los pronósticos fuera de muestra inician el 2 de enero de 2018 y se generan hasta el 1 de diciembre de 2025, fecha en la que todavía puede calcularse una varianza realizada futura de 21 días.
+En el esquema *Fixed Window*, los parámetros se estiman una sola vez utilizando información disponible hasta el 31 de diciembre de 2017. La muestra de entrenamiento inicia con el primer retorno efectivo, correspondiente al 4 de enero de 2000, y se mantiene fija para todo el periodo de evaluación. Los pronósticos fuera de muestra inician el 2 de enero de 2018 y se generan hasta el 1 de diciembre de 2025, fecha en la que todavía puede calcularse una varianza realizada futura de 21 días.
 
 La estimación de parámetros se define como:
 
@@ -438,9 +459,9 @@ $$
 
 El superíndice $m$ identifica el modelo de volatilidad. Bajo este esquema, los parámetros no se re-estiman durante el periodo de prueba. Sin embargo, la varianza condicional sí se actualiza mecánicamente con la información observada al avanzar el tiempo. Esta estrategia reduce la variabilidad de los parámetros estimados, pero puede ser menos sensible a cambios estructurales recientes.
 
-### Rolling Window
+### *Rolling Window*
 
-En el esquema Rolling Window, los modelos se estiman utilizando una ventana móvil de cinco años de negociación, equivalente a:
+En el esquema *Rolling Window*, los modelos se estiman utilizando una ventana móvil de cinco años de negociación, equivalente a:
 
 $$
 w = 252 \times 5 = 1260
@@ -466,7 +487,7 @@ $$
 
 La implementación re-estima los parámetros cada 21 días hábiles. Entre fechas de re-estimación, se conservan los últimos parámetros estimados y se actualiza el estado condicional del modelo con la ventana vigente. Esta decisión reduce el costo computacional y mantiene consistencia con un horizonte mensual de pronóstico. Para modelos con pronóstico analítico disponible se utiliza el método analítico, EGARCH y APARCH emplean simulación dado que el pronóstico analítico no está disponible.
 
-El esquema Rolling Window permite que el modelo responda más rápido a cambios recientes de volatilidad, pero lo hace al costo de utilizar menos información histórica. Como mencionan @pesaran2007selection, la comparación entre Fixed Window y Rolling Window puede interpretarse como un problema de sesgo y varianza, donde una ventana larga reduce ruido de estimación pero puede mezclar regímenes, mientras una ventana corta se adapta mejor pero puede producir parámetros más inestables.
+El esquema *Rolling Window* permite que el modelo responda más rápido a cambios recientes de volatilidad, pero lo hace al costo de utilizar menos información histórica. Como mencionan @pesaran2007selection, la comparación entre *Fixed Window* y *Rolling Window* puede interpretarse como un problema de sesgo y varianza, donde una ventana larga reduce ruido de estimación pero puede mezclar regímenes, mientras una ventana corta se adapta mejor pero puede producir parámetros más inestables.
 
 ## Generación y evaluación de pronósticos de volatilidad
 
@@ -479,7 +500,7 @@ $$
 \widehat{\sigma}_{\tau+j|\tau}^{2,s,m}
 $$
 
-El benchmark observado para evaluación estadística es la varianza realizada construida con retornos cuadrados futuros.
+El *benchmark* observado para evaluación estadística es la varianza realizada construida con retornos cuadrados futuros.
 
 $$
 RV_{\tau,21}
@@ -508,13 +529,13 @@ QLIKE_{s,m}
 \right]
 $$
 
-QLIKE penaliza de forma asimétrica los errores de pronóstico. Un modelo que subestima fuertemente la volatilidad realizada recibe una penalización elevada, lo cual es relevante en contextos financieros donde subestimar riesgo puede ser más costoso que sobreestimarlo moderadamente. Además, su interpretación económica es adecuada para este proyecto porque el objetivo final no es sólo ajustar una serie estadística, sino generar inputs de volatilidad para valuación de opciones y comparación de errores de pricing.
+QLIKE penaliza de forma asimétrica los errores de pronóstico. Un modelo que subestima fuertemente la volatilidad realizada recibe una penalización elevada, lo cual es relevante en contextos financieros donde subestimar riesgo puede ser más costoso que sobreestimarlo moderadamente. Además, su interpretación económica es adecuada para este proyecto porque el objetivo final no es sólo ajustar una serie estadística, sino generar *inputs* de volatilidad para valuación de opciones y comparación de errores de *pricing*.
 
 ## Aplicación financiera mediante valuación de opciones
 
 La aplicación financiera utiliza los pronósticos de volatilidad como insumo para el modelo Black-Scholes. En el modelo original de @black1973pricing, el precio de una opción europea depende del precio del subyacente, el precio de ejercicio, el tiempo al vencimiento, la tasa libre de riesgo y la volatilidad anualizada del subyacente. La limitación central para este estudio es que la volatilidad se trata como constante durante la vida de la opción, mientras que la evidencia empírica y la literatura GARCH sugieren que la volatilidad cambia en el tiempo.
 
-La estrategia del proyecto corresponde a un enfoque *plug-in*. En lugar de estimar un modelo formal de pricing GARCH bajo medida neutral al riesgo como @duan1995garch, se estiman modelos de volatilidad bajo la medida física con retornos históricos y sus pronósticos se introducen en Black-Scholes. Esta lógica es consistente con @bi2014study y @tong2023enhancing, aunque el presente estudio amplía la comparación al incluir modelos simétricos, modelos con asimetría y dos esquemas de estimación.
+La estrategia del proyecto corresponde a un enfoque *plug-in*. En lugar de estimar un modelo formal de *pricing* GARCH bajo medida neutral al riesgo como @duan1995garch, se estiman modelos de volatilidad bajo la medida física con retornos históricos y sus pronósticos se introducen en Black-Scholes. Esta lógica es consistente con @bi2014study y @tong2023enhancing, aunque el presente estudio amplía la comparación al incluir modelos simétricos, modelos con asimetría y dos esquemas de estimación.
 
 ### Modelo Black-Scholes
 
@@ -549,18 +570,18 @@ d_2 =
 d_1-\sigma\sqrt{T}
 $$
 
-| Variable              | Definición                                                                     |
-| --------------------- | ------------------------------------------------------------------------------ |
-| $C_t$                 | precio teórico de una opción call europea                                      |
-| $P_t$                 | precio teórico de una opción put europea                                       |
-| $S_t$                 | precio del activo subyacente en la fecha de valuación                          |
-| $K$                   | precio de ejercicio                                                            |
-| $T$                   | tiempo al vencimiento expresado en años                                        |
-| $r$                   | tasa libre de riesgo anualizada en forma decimal                               |
-| $\sigma$              | volatilidad anualizada del subyacente en forma decimal                         |
-| $N\left(\cdot\right)$ | función de distribución acumulada normal estándar                              |
-| $d_1$                 | distancia estandarizada ajustada por rendimiento libre de riesgo y volatilidad |
-| $d_2$                 | distancia estandarizada ajustada por volatilidad durante el vencimiento        |
+| Variable | Definición |
+|-----------------------|-------------------------------------------------|
+| $C_t$ | precio teórico de una opción call europea |
+| $P_t$ | precio teórico de una opción put europea |
+| $S_t$ | precio del activo subyacente en la fecha de valuación |
+| $K$ | precio de ejercicio |
+| $T$ | tiempo al vencimiento expresado en años |
+| $r$ | tasa libre de riesgo anualizada en forma decimal |
+| $\sigma$ | volatilidad anualizada del subyacente en forma decimal |
+| $N\left(\cdot\right)$ | función de distribución acumulada normal estándar |
+| $d_1$ | distancia estandarizada ajustada por rendimiento libre de riesgo y volatilidad |
+| $d_2$ | distancia estandarizada ajustada por volatilidad durante el vencimiento |
 
 El modelo requiere que $\sigma$ esté anualizada y expresada en forma decimal. Por ello, los pronósticos GARCH no pueden utilizarse directamente, ya que fueron generados como varianzas acumuladas a 21 días en unidades de porcentaje al cuadrado.
 
@@ -601,9 +622,10 @@ $$
 \sigma_{t,hist} = \sqrt{252} \sqrt{\frac{1}{251} \sum_{i=0}^{251} \left(\tilde r_{t-i} - \bar r_{t,252}\right)^2}
 $$
 
-Este benchmark representa el enfoque tradicional en el que la volatilidad se estima como una desviación estándar muestral sobre una ventana histórica fija. Su inclusión permite comparar si el uso de modelos GARCH aporta valor frente a una medida clásica que no modela explícitamente la persistencia, la reversión a la media ni la respuesta asimétrica ante choques.
+Este *benchmark* representa el enfoque tradicional en el que la volatilidad se estima como una desviación estándar muestral sobre una ventana histórica fija. Su inclusión permite comparar si el uso de modelos GARCH aporta valor frente a una medida clásica que no modela explícitamente la persistencia, la reversión a la media ni la respuesta asimétrica ante choques.
 
 ### Dataset de Opciones
+
 La base de datos de opciones utilizada en este estudio proviende de OptionMetrics IvyDB US, una fuente especiaizada en información histórica de opciones listadas en Estados Unidos desde enero de 1996.
 
 La muestra de opciones utilizada contiene contratos sobre el ticker `DJX`, que equivale al `^DJI` dividido entre 100. Para cada contrato se dispone de la fecha de cotización, fecha de vencimiento, tipo de opción, precio de ejercicio, mejor cotización de compra (`best_bid`), mejor cotización de venta (`best_ask`), volatilidad implícita, entre otras. A partir de estas variables se calcula también el número de días al vencimiento como la diferencia entre la fecha de vencimiento y la fecha de cotización. El precio observado de cada opción se construye como el punto medio entre la mejor cotización de compra y la mejor cotización de venta:
@@ -614,9 +636,9 @@ O_i^{obs}
 \frac{Bid_i + Ask_i}{2}
 $$
 
-Para el análisis se selecciona el subconjunto de contratos con 21 días al vencimiento. Esto permite que los contratos estén alineados con el horizonte de pronósitco de volatilidad utilizado en el estudio.
+Para el análisis se selecciona el subconjunto de observaciones con 21 días al vencimiento. Esto permite que las observaciones estén alineados con el horizonte de pronósitco de volatilidad utilizado en el estudio.
 
-El total de observaciones en la base de datos utilizada es de 10,152 contratos, distribuidos entre 5,076 calls y 5,076 puts con vencimientos entre el 16 de febrero de 2018 y el 19 de septiembre de 2025.
+El total de observaciones en la base de datos utilizada es de 10,152 observaciones, distribuidos entre 5,076 calls y 5,076 puts con vencimientos entre el 16 de febrero de 2018 y el 19 de septiembre de 2025.
 
 La tasa libre de riesgo utilizada en Black-Scholes se aproxima mediante `^IRX` descargado con `yfinance`, expresado en forma decimal. El tiempo al vencimiento se calcula como:
 
@@ -627,7 +649,7 @@ $$
 
 donde $DTE_i$ representa los días calendario al vencimiento del contrato.
 
-## Métricas de error en pricing
+## Métricas de error en *pricing*
 
 La evaluación económica se realiza comparando precios observados de mercado contra precios teóricos generados con Black-Scholes. Para cada contrato $i$, esquema de estimación $s$ y modelo de volatilidad $m$, el precio teórico se define como:
 
@@ -644,10 +666,10 @@ r_i,
 \right)
 $$
 
-El error de pricing se define como la diferencia entre el precio observado en el mercado y el precio teórico generado por el modelo.
+El error de *pricing* se define como la diferencia entre el precio observado en el mercado y el precio teórico generado por el modelo.
 
 $$
-e_i^{s,m}
+_i^{s,m}
 =
 O_i^{obs}
 -
@@ -678,38 +700,9 @@ MAE_{s,m}
 \left|e_i^{s,m}\right|
 $$
 
-Para evitar divisiones entre cero, el MAPE se calcula únicamente sobre contratos con precio observado distinto de cero:
+A diferencia de QLIKE, estas métricas se aplican sobre precios observables y no sobre volatilidad latente. Por ello, su uso es consistente con @christoffersen2004importance, quienes enfatizan que la evaluación de modelos de valuación debe estar alineada con la función de pérdida relevante para el objetivo económico. En este estudio, QLIKE evalúa la precisión estadística del pronóstico de volatilidad, mientras RMSE y MAE evalúan el desempeño económico en *pricing* de opciones.
 
-$$
-\mathcal{I}^{*}
-=
-\left\{
-i:
-O_i^{obs}\neq 0
-\right\}
-$$
-
-$$
-N^{*}
-=
-\left|
-\mathcal{I}^{*}
-\right|
-$$
-
-$$
-MAPE_{s,m}
-=
-\frac{100}{N^{*}}
-\sum_{i\in\mathcal{I}^{*}}
-\left|
-\frac{e_i^{s,m}}{O_i^{obs}}
-\right|
-$$
-
-A diferencia de QLIKE, estas métricas se aplican sobre precios observables y no sobre volatilidad latente. Por ello, su uso es consistente con @christoffersen2004importance, quienes enfatizan que la evaluación de modelos de valuación debe estar alineada con la función de pérdida relevante para el objetivo económico. En este estudio, QLIKE evalúa la precisión estadística del pronóstico de volatilidad, mientras RMSE, MAE y MAPE evalúan el desempeño económico en pricing de opciones.
-
-Para complementar la evaluación agregada, los contratos pueden agruparse por moneyness. En la implementación computacional, la razón de moneyness se define de forma que valores cercanos a uno representen opciones at-the-money para calls y puts.
+Para complementar la evaluación agregada, los contratos pueden agruparse por *moneyness*. En la implementación computacional, la razón de *moneyness* se define de forma que valores cercanos a uno representen opciones *at-the-money* para *calls* y *puts*.
 
 $$
 \mathrm{MNY}_i =
@@ -719,7 +712,7 @@ $$
 \end{cases}
 $$
 
-Esta clasificación permite evaluar si los errores de pricing se concentran en contratos at-the-money, near-the-money, moderadamente in-the-money u out-of-the-money, y deep in-the-money u out-of-the-money. La motivación es que @christoffersen2004importance muestran que el desempeño de modelos de valuación puede variar sustancialmente según moneyness y vencimiento.
+Esta clasificación permite evaluar si los errores de *pricing* se concentran en contratos *at-the-money*, *near-the-money*, moderadamente *in-the-money* u *out-of-the-money*, y *deep in-the-money* u *out-of-the-money*. La motivación es que @christoffersen2004importance muestran que el desempeño de modelos de valuación puede variar sustancialmente según *moneyness* y vencimiento.
 
 ## Implementación y reproducibilidad
 
@@ -727,28 +720,29 @@ La implementación se realiza en Python utilizando `pandas` y `numpy` para manip
 
 Los parámetros operativos principales son:
 
-| Elemento                                          | Valor utilizado         |
-| ------------------------------------------------- | ----------------------- |
-| Horizonte de pronóstico                           | $h=21$ días hábiles     |
-| Días de negociación por año                       | $252$                   |
-| Fin de la muestra de entrenamiento Fixed Window   | 31 de diciembre de 2017 |
-| Inicio de evaluación fuera de muestra             | 2 de enero de 2018      |
-| Tamaño de Rolling Window                          | $252 \times 5$ días     |
-| Frecuencia de re-estimación Rolling Window        | cada 21 días hábiles    |
+| Elemento                                        | Valor utilizado         |
+|----------------------------------------------|--------------------------|
+| Horizonte de pronóstico                         | $h=21$ días hábiles     |
+| Días de negociación por año                     | $252$                   |
+| Fin de la muestra de entrenamiento Fixed Window | 31 de diciembre de 2017 |
+| Inicio de evaluación fuera de muestra           | 2 de enero de 2018      |
+| Tamaño de Rolling Window                        | $252 \times 5$ días     |
+| Frecuencia de re-estimación Rolling Window      | cada 21 días hábiles    |
 
 # Resultados
+
 ## Evidencia empírica inicial de la serie de retornos
 
-La serie diaria de retornos logarítmicos del Dow Jones Industrial Average presenta rasgos consistentes con la necesidad de modelar la volatilidad de forma dinámica. El rendimiento promedio diario es positivo, aunque pequeño, con una media de 0.0222% y una desviación estándar diaria de 1.1591%. 
+La serie diaria de retornos logarítmicos del Dow Jones Industrial Average presenta rasgos consistentes con la necesidad de modelar la volatilidad de forma dinámica. El rendimiento promedio diario es positivo, aunque pequeño, con una media de 0.0222% y una desviación estándar diaria de 1.1591%.
 
 La @fig-returns muestra la evolución temporal de los retornos diarios. Se observan episodios de alta volatilidad concentrados en ciertos periodos, lo que sguiere que al varianza no permanece constante en el tiempo.
 
-![Retornos Logarítmicos Diarios del DJIA](figures/returns.png){#fig-returns}
+![Retornos Logarítmicos Diarios del DJIA](figures/fig-returns.png){#fig-returns}
 
 La asimetría negativa de -0.3478 indica que las caídas extremas tienden a ser más pronunciadas que los movimientos positivos equivalentes, mientras que la curtosis de Pearson de 15.9585 confirma una distribución altamente leptocúrtica. Esta evidencia es coherente con la presencia de colas pesadas, eventos extremos y desviaciones respecto al supuesto normal.
 
 | Estadístico                           |   Valor |
-| ------------------------------------- | ------: |
+|---------------------------------------|--------:|
 | Media diaria (%)                      |  0.0222 |
 | Desviación estándar diaria (%)        |  1.1591 |
 | Asimetría                             | -0.3478 |
@@ -756,9 +750,9 @@ La asimetría negativa de -0.3478 indica que las caídas extremas tienden a ser 
 | Curtosis de Pearson                   | 15.9585 |
 | Grados de libertad t-Student ajustada |  2.7097 |
 
-: Estadísticos descriptivos de los retornos diarios del DJIA {#tbl-statistics}
+: Estadísticos descriptivos de los retornos diarios del DJIA
 
-La evidencia descriptiva se refuerza visualmente al comparar la distribución empírica de los retornos con una distribución normal y una Student-t ajustada.
+La evidencia descriptiva se refuerza visualmente en la @fig-dist al comparar la distribución empírica de los retornos con una distribución normal y una Student-t ajustada.
 
 ![Distribución de los Retornos Diarios del DJIA frente a Distribuciones Normal y Student-t Ajustada](figures/fig-dist.png){#fig-dist fig-alt="La distribución empírica presenta mayor concentración alrededor de cero y colas más pesadas que la normal. La Student-t ajustada captura mejor la leptocurtosis observada."}
 
@@ -766,17 +760,17 @@ La distribución de los retornos muestra una concentración elevada alrededor de
 
 Las pruebas de diagnóstico refuerzan la pertinencia del enfoque GARCH. La prueba ADF rechaza la hipótesis de raíz unitaria con un estadístico de -15.703 y un p-value cercano a cero, por lo que la serie de retornos puede tratarse como estacionaria. Sin embargo, la prueba Ljung-Box aplicada sobre los retornos muestra dependencia serial acumulada estadísticamente significativa para los rezagos 10 y 20. Al aplicar la misma prueba a la varianza realizada, los estadísticos aumentan considerablemente y los p-values son cero, lo que representa evidencia de dependencia temporal fuerte en los segundos momentos.
 
-| Prueba                     | Estadístico |  p-value | Interpretación                                 |
-| -------------------------- | ----------: | -------: | ---------------------------------------------- |
-| ADF sobre retornos         |    -15.7030 |   0.0000 | Retornos estacionarios                         |
-| Ljung-Box retornos, lag 10 |    107.7131 | 1.54e-18 | Autocorrelación estadísticamente significativa |
-| Ljung-Box retornos, lag 20 |    179.0500 | 1.49e-27 | Autocorrelación estadísticamente significativa |
-| Ljung-Box varianza, lag 10 |   6232.1262 |   0.0000 | Fuerte dependencia en volatilidad              |
-| Ljung-Box varianza, lag 20 |   8286.6317 |   0.0000 | Fuerte dependencia en volatilidad              |
+| Prueba | Estadístico | p-value | Interpretación |
+|------------------|-----------------:|-----------------:|-------------------|
+| ADF sobre retornos | -15.7030 | 0.0000 | Retornos estacionarios |
+| Ljung-Box retornos, lag 10 | 107.7131 | 1.54e-18 | Autocorrelación estadísticamente significativa |
+| Ljung-Box retornos, lag 20 | 179.0500 | 1.49e-27 | Autocorrelación estadísticamente significativa |
+| Ljung-Box varianza, lag 10 | 6232.1262 | 0.0000 | Fuerte dependencia en volatilidad |
+| Ljung-Box varianza, lag 20 | 8286.6317 | 0.0000 | Fuerte dependencia en volatilidad |
 
-: Pruebas de estacionariedad y autocorrelación {#tbl-tests}
+: Pruebas de estacionariedad y autocorrelación
 
-La evidencia de dependencia en la varianza también se observa directamente en la serie de varianza diaria realizada.
+La evidencia de dependencia en la varianza también se observa directamente en la serie de varianza diaria realizada, como se muestra en la @fig-variance.
 
 ![Varianza Diaria Realizada del DJIA](figures/fig-variance.png){#fig-variance}
 
@@ -788,140 +782,220 @@ Para complementar la lectura visual anterior, la @fig-acf presenta las funciones
 
 La persistencia observada en la ACF de la varianza confirma que los segundos momentos de la serie contienen información predictiva. Este resultado es central para justificar modelos donde la varianza condicional depende de choques pasados y de su propia dinámica rezagada.
 
-## Resultados in-sample bajo esquema Fixed Window
+## Resultados *in-sample* bajo esquema *Fixed Window*
 
-La comparación in-sample se realizó mediante los criterios AIC y BIC. Ambos criterios penalizan la complejidad del modelo, aunque el BIC lo hace de forma más estricta. En este estudio, el modelo APARCH(1,1,1) con distribución Skewed Student-t es el que obtuvo el mejor ajuste, con el menor AIC y el menor BIC.
+La comparación *in-sample* se realizó mediante los criterios AIC y BIC. Ambos criterios penalizan la complejidad del modelo, aunque el BIC lo hace de forma más estricta. En este estudio, el modelo APARCH(1,1,1) con distribución Skewed Student-t es el que obtuvo el mejor ajuste, con el menor AIC y el menor BIC.
 
-|  # | Modelo de media | Proceso de volatilidad | Distribución     |            AIC |            BIC |
-| -: | --------------- | ---------------------- | ---------------- | -------------: | -------------: |
-|  1 | Media constante | ARCH(1)                | Student-t        |     12639.0054 |     12664.6766 |
-|  2 | AR(1)           | GARCH(1,1)             | Student-t        |     11737.1110 |     11775.6166 |
-|  3 | AR(1)           | EGARCH(1,1)            | Normal           |     11922.9646 |     11955.0525 |
-|  4 | AR(1)           | GJR-GARCH(1,1)         | Student-t        |     11584.4499 |     11629.3730 |
-|  5 | AR(1)           | APARCH(1,1)            | Skewed Student-t | 11511.0937 | 11568.8520 |
+| \# Modelo | Modelo de media | Proceso de volatilidad | Distribución | AIC | BIC |
+|-----------:|------------|------------|------------|-----------:|-----------:|
+| 1 | Media constante | ARCH(1) | Student-t | 12639.0054 | 12664.6766 |
+| 2 | AR(1) | GARCH(1,1) | Student-t | 11737.1110 | 11775.6166 |
+| 3 | AR(1) | EGARCH(1,1) | Normal | 11922.9646 | 11955.0525 |
+| 4 | AR(1) | GJR-GARCH(1,1) | Student-t | 11584.4499 | 11629.3730 |
+| 5 | AR(1) | APARCH(1,1) | Skewed Student-t | 11511.0937 | 11568.8520 |
 
-: Comparación in-sample: AIC y BIC {#tbl-AICBIC}
+: Comparación in-sample: AIC y BIC
 
-El resultado favorece claramente a una especificación flexible y asimétrica. La ventaja de APARCH sobre GJR-GARCH es de aproximadamente 73.36 puntos en AIC y 60.52 puntos en BIC, lo que sugiere que la mejora de ajuste no proviene únicamente de agregar parámetros. Además, el parámetro de asimetría estimado en APARCH y la distribución Skewed Student-t capturan dos rasgos observados en la serie: respuesta diferencial ante choques negativos y distribución no simétrica de innovaciones.
+El resultado favorece claramente a una especificación flexible y asimétrica. La ventaja de APARCH sobre GJR-GARCH es de aproximadamente 73.36 puntos en AIC y 60.52 puntos en BIC, lo que sugiere que la mejora de ajuste no proviene únicamente de agregar parámetros. Además, el parámetro de asimetría estimado en APARCH y la distribución Skewed Student-t capturan la respuesta diferencial ante choques negativos y una distribución no simétrica de innovaciones.
 
-Sin embargo, el ranking in-sample no debe interpretarse como evidencia definitiva de superioridad predictiva. La comparación con los resultados fuera de muestra muestra que el mejor ajuste estadístico dentro de la muestra no necesariamente coincide con el mejor desempeño predictivo o económico.
+Sin embargo, el ranking *in-sample* no debe interpretarse como evidencia definitiva de superioridad predictiva. La comparación con los resultados fuera de muestra muestra que el mejor ajuste estadístico dentro de la muestra no necesariamente coincide con el mejor desempeño predictivo o económico.
 
-## Pronóstico out-of-sample de Volatilidad
+## Pronóstico *out-of-sample* de Varianza
 
-La evaluación fuera de muestra cubre el periodo del 2 de enero de 2018 al 1 de diciembre de 2025, con 1990 observaciones de pronóstico de varianza acumulada a 21 días. La métrica principal es QLIKE, donde valores más bajos indican mejor desempeño predictivo. El uso de varianza acumulada a 21 días es consistente con la idea de que la volatilidad relevante para una opción debe reflejar el riesgo durante la vida del contrato.
+La evaluación fuera de muestra cubre el periodo del 2 de enero de 2018 al 1 de diciembre de 2025, con 1990 observaciones de pronóstico de varianza acumulada a 21 días, lo cual es consistente con la idea de que la volatilidad relevante para una opción debe reflejar el riesgo durante la vida del contrato. La métrica utilizada para evaluar el desempeño predictivo es QLIKE, donde valores más bajos indican mejor desempeño predictivo. 
 
-| Ranking | Modelo                        |      QLIKE |
-| ------: | ----------------------------- | ---------: |
-|       1 | EGARCH(1,1) Fixed-Window      |     0.4203 |
-|       2 | GARCH(1,1) Fixed-Window       |     0.4355 |
-|       3 | GARCH(1,1) Rolling-Window     |     0.4650 |
-|       4 | GJR-GARCH(1,1) Fixed-Window   |     0.4813 |
-|       5 | APARCH(1,1) Fixed-Window      |     0.4839 |
-|       6 | APARCH(1,1) Rolling-Window    |     0.5222 |
-|       7 | GJR-GARCH(1,1) Rolling-Window |     0.5289 |
-|       8 | EGARCH(1,1) Rolling-Window    |     0.5298 |
-|       9 | ARCH(1) Fixed-Window          |     0.6201 |
-|      10 | ARCH(1) Rolling-Window        |     0.9479 |
+| Ranking | Modelo                        |  QLIKE |
+|--------:|-------------------------------|-------:|
+|       1 | EGARCH(1,1) Fixed-Window      | 0.4203 |
+|       2 | GARCH(1,1) Fixed-Window       | 0.4355 |
+|       3 | GARCH(1,1) Rolling-Window     | 0.4650 |
+|       4 | GJR-GARCH(1,1) Fixed-Window   | 0.4813 |
+|       5 | APARCH(1,1) Fixed-Window      | 0.4839 |
+|       6 | APARCH(1,1) Rolling-Window    | 0.5222 |
+|       7 | GJR-GARCH(1,1) Rolling-Window | 0.5289 |
+|       8 | EGARCH(1,1) Rolling-Window    | 0.5298 |
+|       9 | ARCH(1) Fixed-Window          | 0.6201 |
+|      10 | ARCH(1) Rolling-Window        | 0.9479 |
 
-: QLIKE out-of-sample contra Varianza Realizada {#tbl-QLIKE_RV}
+: QLIKE out-of-sample contra Varianza Realizada
 
 El mejor desempeño frente a varianza realizada corresponde a EGARCH(1,1) con ventana fija. Esto es relevante porque EGARCH no fue el mejor modelo in-sample por AIC/BIC; aun así, genera la pérdida QLIKE más baja fuera de muestra. El segundo lugar corresponde a GARCH(1,1) con ventana fija, lo que confirma que una especificación parsimoniosa puede ser altamente competitiva en pronóstico agregado de volatilidad. ARCH(1), especialmente bajo rolling window, presenta el peor desempeño, lo que indica que incorporar únicamente choques rezagados sin persistencia suficiente en la varianza condicional es insuficiente para este horizonte.
 
 La comparación entre esquemas de estimación también es informativa. Para el criterio QLIKE contra varianza realizada, las especificaciones con ventana fija dominan en varios casos a sus versiones rolling. Esto sugiere que, en el pronóstico estadístico agregado de varianza a 21 días, estimar con una base histórica amplia puede aportar estabilidad y reducir la variabilidad de parámetros.
 
-FIGURA X - PENDIENTE: PRONOSTICOS OUT-OF-SAMPLE DE VOLATILIDAD PARA MODELOS SELECCIONADOS
+A modo ilustrativo, la @fig-comparison muestra la evolución temporal de los pronósticos de varianza acumulada a 21 días para los modelos EGARCH(1,1) bajo ventana fija y GARCH(1,1) bajo ventana fija y rolling, comparados contra la varianza realizada.
 
-PARRAFO INTERPRETANDO FIGURA X
+![Comparación de Pronósticos de Varianza contra Varianza Realizada](figures/fig-comparison.png){#fig-comparison}
 
-Los diagnósticos visuales modelo por modelo se reportan en el Anexo A. [PENDIENTE CREAR ANEXO] En conjunto, estos gráficos confirman que las especificaciones con menor QLIKE presentan menor dispersión relativa frente a la volatilidad realizada, mientras que ARCH, especialmente bajo rolling window, muestra errores más amplios y menor capacidad para capturar episodios de volatilidad elevada.
+Otra forma de interpretar los errores en pronóstico de varianza es como la diferencia entre la varianza realizada y la varianza pronosticada. La @sec-apendice-a muestra el conjunto de gráficas que ilustran estos errores para cada modelo y esquema de estimación. En general, los modelos con menor QLIKE presentan errores más concentrados alrededor de cero, mientras que ARCH, especialmente bajo rolling window, muestra errores más amplios y con mayor dispersión.
+
+Los diagnósticos visuales modelo por modelo se reportan en la @sec-apendice-b. En conjunto, estos gráficos confirman que las especificaciones con menor QLIKE presentan menor dispersión relativa frente a la volatilidad realizada, mientras que ARCH, especialmente bajo rolling window, muestra errores más amplios y menor capacidad para capturar episodios de volatilidad elevada.
 
 Como contraste adicional, se compararon los pronósticos de volatilidad anualizada contra la volatilidad implícita observada en el dataset de opciones.
 
-| Ranking | Modelo                         |      QLIKE |
-| ------: | ------------------------------ | ---------: |
-|       1 | ARCH(1) Rolling-Window         |     0.4564 |
-|       2 | ARCH(1) Fixed-Window           |     0.4569 |
-|       3 | EGARCH(1,1) Rolling-Window     |     0.7736 |
-|       4 | GARCH(1,1) Rolling-Window      |     0.8090 |
-|       5 | EGARCH(1,1) Fixed-Window       |     0.8378 |
-|       6 | APARCH(1,1) Rolling-Window     |     0.8800 |
-|       7 | Volatilidad histórica 252 días |     0.8912 |
-|       8 | GARCH(1,1) Fixed-Window        |     0.9037 |
-|       9 | GJR-GARCH(1,1) Rolling-Window  |     0.9192 |
-|      10 | APARCH(1,1) Fixed-Window       |     0.9885 |
-|      11 | GJR-GARCH(1,1) Fixed-Window    |     1.0312 |
+| Ranking | Modelo                         |  QLIKE |
+|--------:|--------------------------------|-------:|
+|       1 | ARCH(1) Rolling-Window         | 0.4564 |
+|       2 | ARCH(1) Fixed-Window           | 0.4569 |
+|       3 | EGARCH(1,1) Rolling-Window     | 0.7736 |
+|       4 | GARCH(1,1) Rolling-Window      | 0.8090 |
+|       5 | EGARCH(1,1) Fixed-Window       | 0.8378 |
+|       6 | APARCH(1,1) Rolling-Window     | 0.8800 |
+|       7 | Volatilidad histórica 252 días | 0.8912 |
+|       8 | GARCH(1,1) Fixed-Window        | 0.9037 |
+|       9 | GJR-GARCH(1,1) Rolling-Window  | 0.9192 |
+|      10 | APARCH(1,1) Fixed-Window       | 0.9885 |
+|      11 | GJR-GARCH(1,1) Fixed-Window    | 1.0312 |
 
-: QLIKE out-of-sample contra Volatilidad Implícita {#tbl-QLIKE_IV}
+: QLIKE out-of-sample contra Volatilidad Implícita
 
-Este ranking cambia de forma considerable respecto al obtenido con varianza realizada. ARCH aparece cerca de la volatilidad implícita, pero ese resultado no implica que sea superior para pricing. La volatilidad implícita incorpora primas de riesgo, expectativas de mercado y efectos cross-section por strike y tipo de opción, mientras que los modelos GARCH generan una volatilidad por fecha basada en la historia del subyacente. Por ello, la comparación contra volatilidad implícita debe interpretarse como un contraste de cercanía al mercado, no como una prueba directa de capacidad predictiva ni de precisión económica.
+Este ranking cambia de forma considerable respecto al obtenido con varianza realizada. ARCH aparece cerca de la volatilidad implícita, pero ese resultado no implica que sea superior para pricing. La volatilidad implícita incorpora primas de riesgo, expectativas de mercado y efectos cross-section por strike y tipo de opción, mientras que los modelos GARCH generan una volatilidad por fecha basada en la historia del subyacente. Por este motivo la volatilidad implícita suele ser mayor a la volatilidad realizada y el modelo ARCH, al no incorporar la persistencia tiende a sobreestimar la volatilidad. En el resultado podemos observar que este sesgo coincide accidentalmente con los niveles elevados del mercado. Por ello, la comparación contra volatilidad implícita debe interpretarse como un contraste de cercanía al mercado, no como una prueba directa de capacidad predictiva ni de precisión económica.
 
-La diferencia entre los rankings confirma que el desempeño de un modelo depende del objeto de evaluación: varianza realizada, volatilidad implícita o precio de opción. Esto refuerza la idea de que un modelo puede minimizar errores de volatilidad y no necesariamente minimizar errores de pricing, y viceversa.
+La diferencia entre los rankings confirma que el desempeño de un modelo depende del objeto de evaluación, ya sea varianza realizada, volatilidad implícita o precio de opción. Esto refuerza la idea de que un modelo puede minimizar errores de volatilidad y no necesariamente minimizar errores de pricing, y viceversa.
 
 ## Aplicación Económica: Pricing de Opciones
-La evaluación económica se realizó usando los pronósticos en precios de contratos tras evaluar el modelo Black-Scholes con la volatilidad anualizada derivada de los modelos GARCH como input.
 
-La muestra final contiene 10,152 contratos de opciones que se clasificaron por moneyness para evaluar si el desempeño de los modelos cambia según la posición relativa del strike y el subyacente. La clasificación utiliza la razón de moneyness definida como $\mathrm{MNY}$ de forma que valores cercanos a uno representen opciones at-the-money tanto para calls como para puts.
+La evaluación económica se realizó usando los pronósticos en precios de contratos tras evaluar el modelo Black-Scholes con la volatilidad anualizada derivada de los modelos GARCH como *input*.
 
-| Categoría          | Rango de moneyness                | Observaciones |
-| ------------------ | --------------------------------- | ------------: |
-| ATM                | 0.97 ≤ m ≤ 1.03                   |         1,144 |
-| Near-the-money     | 0.94 < m < 0.97 o 1.03 < m < 1.06 |         1,077 |
-| Moderately OTM/ITM | 0.88 < m ≤ 0.94 o 1.06 ≤ m < 1.12 |         1,693 |
-| Deep OTM/ITM       | m < 0.88 o m ≥ 1.12               |         6,238 |
+La muestra final contiene 10,152 observaciones de opciones que se clasificaron por *moneyness* para evaluar si el desempeño de los modelos cambia según la posición relativa del strike y el subyacente. La clasificación utiliza la razón de *moneyness* definida como $\mathrm{MNY}$ de forma que valores cercanos a uno representen opciones *at-the-money* tanto para *calls* como para *puts*.
 
-: Distribución de Contratos por Categoría de Moneyness {#tbl-moneyness}
+| Categoría          | Rango de moneyness                                            | Observaciones |
+|--------------------|---------------------------------------------------------------|--------------:|
+| ATM                | $0.97 \le \mathrm{MNY} \le 1.03$                             |         1,144 |
+| Near-the-money     | $0.94 < \mathrm{MNY} < 0.97$ o $1.03 < \mathrm{MNY} < 1.06$   |         1,077 |
+| Moderately OTM/ITM | $0.88 < \mathrm{MNY} \le 0.94$ o $1.06 \le \mathrm{MNY} < 1.12$ |         1,693 |
+| Deep OTM/ITM       | $\mathrm{MNY} < 0.88$ o $\mathrm{MNY} \ge 1.12$              |         6,238 |
 
-El ranking por RMSE muestra que el modelo GJR-GARCH(1,1,1) con Rolling Window ocupa el primer lugar en las cuatro categorías de moneyness. Esto sugiere que, aunque no fue el mejor modelo en AIC/BIC ni en QLIKE contra varianza realizada, sí entrega el mejor desempeño económico al traducir la volatilidad pronosticada a precios teóricos de opciones. 
+: Distribución de Contratos por Categoría de Moneyness
 
-| Categoría          | Ranking | Modelo                        |       RMSE |    MAE | MAPE (%) |
-| ------------------ | ------: | ----------------------------- | ---------: | -----: | -------: |
-| ATM                |       1 | GJR-GARCH(1,1) Rolling-Window | 1.0205  | 0.7428 |  22.9105 |
-| ATM                |       2 | APARCH(1,1) Fixed-Window      |     1.0375 | 0.7702 |  23.8484 |
-| ATM                |       3 | APARCH(1,1) Rolling-Window    |     1.0919 | 0.7952 |  24.3419 |
-| Near-the-money     |       1 | GJR-GARCH(1,1) Rolling-Window | 0.8840  | 0.6166 |  55.5501 |
-| Near-the-money     |       2 | APARCH(1,1) Fixed-Window      |     0.9463 | 0.6555 |  57.4330 |
-| Near-the-money     |       3 | APARCH(1,1) Rolling-Window    |     0.9588 | 0.6521 |  62.9452 |
-| Moderately OTM/ITM |       1 | GJR-GARCH(1,1) Rolling-Window | 0.6557  | 0.4175 |  63.9012 |
-| Moderately OTM/ITM |       2 | APARCH(1,1) Rolling-Window    |     0.6967 | 0.4306 |  62.0514 |
-| Moderately OTM/ITM |       3 | APARCH(1,1) Fixed-Window      |     0.6972 | 0.4348 |  65.0278 |
-| Deep OTM/ITM       |       1 | GJR-GARCH(1,1) Rolling-Window |     0.5804 | 0.3443 |  50.6596 |
-| Deep OTM/ITM       |       2 | APARCH(1,1) Rolling-Window    |     0.5834 | 0.3426 |  48.4720 |
-| Deep OTM/ITM       |       3 | EGARCH(1,1) Fixed-Window      |     0.5856 | 0.3442 |  48.7933 |
+El ranking por RMSE muestra que el modelo GJR-GARCH(1,1,1) con *Rolling Window* ocupa el primer lugar en las cuatro categorías de *moneyness*. Esto sugiere que, aunque no fue el mejor modelo en AIC/BIC ni en QLIKE contra varianza realizada, sí entrega el mejor desempeño económico al traducir la volatilidad pronosticada a precios teóricos de opciones.
 
-: Top 3 Modelos por RMSE en cada categoría de moneyness {#tbl-RMSE_moneyness}
+| Categoría          | Ranking | Modelo                        |   RMSE |    MAE |
+|--------------------|--------:|-------------------------------|-------:|-------:|
+| ATM                |       1 | GJR-GARCH(1,1) Rolling-Window | 1.0205 | 0.7428 |
+| ATM                |       2 | APARCH(1,1) Fixed-Window      | 1.0375 | 0.7702 |
+| ATM                |       3 | APARCH(1,1) Rolling-Window    | 1.0919 | 0.7952 |
+| Near-the-money     |       1 | GJR-GARCH(1,1) Rolling-Window | 0.8840 | 0.6166 |
+| Near-the-money     |       2 | APARCH(1,1) Fixed-Window      | 0.9463 | 0.6555 |
+| Near-the-money     |       3 | APARCH(1,1) Rolling-Window    | 0.9588 | 0.6521 |
+| Moderately OTM/ITM |       1 | GJR-GARCH(1,1) Rolling-Window | 0.6557 | 0.4175 |
+| Moderately OTM/ITM |       2 | APARCH(1,1) Rolling-Window    | 0.6967 | 0.4306 |
+| Moderately OTM/ITM |       3 | APARCH(1,1) Fixed-Window      | 0.6972 | 0.4348 |
+| Deep OTM/ITM       |       1 | GJR-GARCH(1,1) Rolling-Window | 0.5804 | 0.3443 |
+| Deep OTM/ITM       |       2 | APARCH(1,1) Rolling-Window    | 0.5834 | 0.3426 |
+| Deep OTM/ITM       |       3 | EGARCH(1,1) Fixed-Window      | 0.5856 | 0.3442 |
 
-La superioridad de GJR-GARCH rolling en pricing sugiere que el efecto asimétrico tipo leverage es especialmente útil cuando la volatilidad se utiliza para valuar opciones. El resultado también muestra que la actualización de parámetros mediante rolling window no necesariamente mejora el pronóstico agregado de varianza, pero sí puede mejorar la capacidad del modelo para generar precios cercanos al mercado.
+: Top 3 Modelos por RMSE en cada categoría de moneyness
 
-APARCH aparece de manera consistente entre los primeros lugares, especialmente en las categorías ATM, near-the-money y moderately OTM/ITM. Sin embargo, su ventaja in-sample no se traduce en el primer lugar económico. Este resultado evidencia que la mayor flexibilidad paramétrica mejora el ajuste histórico, pero no garantiza la menor pérdida de pricing.
+La superioridad de GJR-GARCH rolling en *pricing* sugiere que el efecto asimétrico tipo leverage es especialmente útil cuando la volatilidad se utiliza para valuar opciones. El resultado también muestra que la actualización de parámetros mediante *rolling window* no necesariamente mejora el pronóstico agregado de varianza, pero sí puede mejorar la capacidad del modelo para generar precios cercanos al mercado.
+
+APARCH aparece de manera consistente entre los primeros lugares, especialmente en las categorías *ATM*, *near-the-money* y moderately *OTM/ITM*. Sin embargo, su ventaja *in-sample* no se traduce en el primer lugar económico. Este resultado evidencia que la mayor flexibilidad paramétrica mejora el ajuste histórico, pero no garantiza la menor pérdida de *pricing*.
 
 En la categoría deep OTM/ITM las diferencias entre los mejores modelos son pequeñas. El RMSE del primer lugar es 0.5804, frente a 0.5834 para APARCH rolling y 0.5856 para EGARCH fixed. Esto indica que, en opciones más alejadas del dinero, el ranking es menos contundente y la distancia entre modelos se reduce.
 
-Para evaluar el valor agregado frente a una alternativa clásica, se compara el MAE del mejor modelo económico (GJR-GARCH Rolling) contra el benchmark de volatilidad histórica anualizada con ventana de 252 días y contra el peor modelo global (ARCH Rolling).
+Para evaluar el valor agregado frente a una alternativa clásica, se compara el MAE del mejor modelo económico (GJR-GARCH *Rolling*) contra el *benchmark* de volatilidad histórica anualizada con ventana de 252 días y contra el peor modelo global (ARCH *Rolling*).
 
-| Categoría          | GJR-GARCH Rolling | Volatilidad histórica 252 días | ARCH Rolling |
-| ------------------ | ----------------: | -----------------------------: | -----------: |
-| ATM                |        0.7428 |                         1.3859 |       3.0921 |
-| Near-the-money     |        0.6166 |                         0.9499 |       2.1586 |
-| Moderately OTM/ITM |        0.4175 |                         0.5584 |       1.0536 |
-| Deep OTM/ITM       |        0.3443 |                         0.3503 |       0.3916 |
+| Categoría | GJR-GARCH Rolling | Volatilidad histórica 252 días | ARCH Rolling |
+|------------------|-----------------:|------------------:|-----------------:|
+| ATM | 0.7428 | 1.3859 | 3.0921 |
+| Near-the-money | 0.6166 | 0.9499 | 2.1586 |
+| Moderately OTM/ITM | 0.4175 | 0.5584 | 1.0536 |
+| Deep OTM/ITM | 0.3443 | 0.3503 | 0.3916 |
 
-: Comparación de MAE por Categoría {#tbl-MAE_comparison}
+: Comparación de MAE por Categoría
 
-El modelo GJR-GARCH rolling reduce el MAE frente a la volatilidad histórica en todas las categorías. La mejora es mayor en contratos ATM, donde el MAE cae de 1.3859 a 0.7428, una reducción aproximada de 46.4%. En near-the-money la reducción es de 35.1%, y en moderately OTM/ITM es de 25.2%. En deep OTM/ITM la mejora es mucho menor, cercana a 1.7%, lo que indica que la volatilidad histórica simple ya es competitiva para contratos muy alejados del dinero.
+![Comparación de MAE entre GJR-GARCH Rolling, Volatilidad Histórica y ARCH Rolling](figures/fig-mae_comparison.png){#fig-mae-comparison}
+
+El modelo GJR-GARCH rolling reduce el MAE frente a la volatilidad histórica en todas las categorías. La mejora es mayor en contratos *ATM*, donde el MAE cae de 1.3859 a 0.7428, una reducción aproximada de 46.4%. En *near-the-money* la reducción es de 35.1%, y en moderately *OTM/ITM* es de 25.2%. En deep *OTM/ITM* la mejora es mucho menor, cercana a 1.7%, lo que indica que la volatilidad histórica simple ya es competitiva para contratos muy alejados del dinero.
 
 Este patrón es financieramente razonable. Las opciones ATM y cercanas al dinero son más sensibles a cambios en volatilidad, por lo que una estimación dinámica de volatilidad tiene mayor capacidad de mejorar el precio teórico. En cambio, para opciones deep OTM/ITM, una parte importante del precio está determinada por el valor intrínseco o por probabilidades de ejercicio muy bajas, de modo que la ganancia marginal de sofisticar el modelo de volatilidad es más limitada.
 
-## Síntesis de Resultados
-Los resultados muestran que la respuesta a la pregunta sobre el “mejor” modelo depende del criterio utilizado. En ajuste in-sample, APARCH(1,1) con distribución Skewed Student-t es el modelo dominante, tanto por AIC como por BIC. En pronóstico estadístico contra varianza realizada, EGARCH(1,1) con ventana fija obtiene el menor QLIKE. En pricing de opciones, el mejor desempeño corresponde a GJR-GARCH(1,1) con rolling window, que alcanza el menor RMSE en las cuatro categorías de moneyness.
+Por último, la @fig-error-reduction muestra que incorporar volatilidad condicional mediante modelos como el GJR-GARCH aporta mejoras sustanciales en la valuación de opciones frente al uso de volatilidad histórica constante. En todas las categorías analizadas, los errores de valuación disminuyen de manera consistente, alcanzando reducciones de hasta 46.40% en MAE y 49.85% en RMSE. Estos resultados confirman que la volatilidad en los mercados financieros no es estática, sino dinámica y dependiente de la información pasada, por lo que asumir una volatilidad histórica fija limita significativamente la precisión de los modelos tradicionales.
 
-La evidencia confirma que no existe una equivalencia automática entre precisión estadística y valor económico. Un modelo puede ajustarse mejor a los retornos históricos o pronosticar mejor la varianza realizada y, aun así, no ser el que minimiza errores de pricing. Esta divergencia es precisamente lo que justifica evaluar los modelos en dos dimensiones: una estadística, centrada en la volatilidad, y otra económica, centrada en precios de opciones.
-
-El resultado más importante desde el punto de vista económico es que las especificaciones asimétricas superan al benchmark histórico y al ARCH simple en la valuación de opciones. GJR-GARCH rolling es especialmente robusto, pues mantiene el primer lugar en RMSE para ATM, near-the-money, moderately OTM/ITM y deep OTM/ITM. La mejora frente a la volatilidad histórica es sustancial en opciones cercanas al dinero, donde la sensibilidad a la volatilidad es mayor, y se reduce en contratos deep OTM/ITM.
-
-En conclusión, los resultados apoyan el uso de modelos GARCH asimétricos para aplicaciones de pricing. APARCH es el modelo más sólido en términos de ajuste in-sample, EGARCH fixed es el más competitivo en pérdida estadística contra varianza realizada, y GJR-GARCH rolling es el modelo con mayor valor económico en la aplicación Black-Scholes del estudio.
+![Reducción porcentual de errores del mejor modelo frente a volatilidad histórica por categoría de moneyness](figures/fig_improvement.png){#fig-error-reduction}
 
 # Conclusión
+
+Los resultados de este proyecto muestran que la elección del “mejor” modelo GARCH depende directamente del objetivo de evaluación. En términos de ajuste *in-sample*, APARCH(1,1) con distribución Skewed Student-t fue el modelo más sólido, ya que capturó con mayor flexibilidad la dinámica histórica de los retornos. En el pronóstico estadístico *out-of-sample*, EGARCH(1,1) con ventana fija obtuvo el mejor desempeño frente a la varianza realizada, lo que confirma que una especificación asimétrica y relativamente parsimoniosa puede ser altamente competitiva cuando el criterio central es minimizar la pérdida de volatilidad. Sin embargo, al trasladar los pronósticos de volatilidad a una aplicación financiera concreta, el resultado más relevante cambia; el modelo GJR-GARCH(1,1) con *rolling window* consiguió un mejor desempeño económico, al obtener el menor error de *pricing* en las cuatro categorías de *moneyness* evaluadas.
+
+Este resultado es importante porque confirma que precisión estadística y valor económico no son equivalentes. Un modelo puede ajustarse mejor a los retornos históricos o pronosticar mejor la varianza realizada y, aun así, no ser el que genera precios de opciones más cercanos al mercado. La principal contribución del proyecto está precisamente en mostrar que evaluar modelos de volatilidad únicamente con criterios estadísticos puede ser insuficiente cuando el objetivo final es una aplicación financiera. En este caso, el criterio económico permitió identificar que el modelo más útil para *pricing* no fue el más complejo ni el de mejor ajuste *in-sample*, sino aquel que tradujo mejor la información de volatilidad hacia precios teóricos.
+
+La superioridad de GJR-GARCH en *pricing* puede explicarse por su capacidad para capturar el efecto asimétrico tipo leverage. En mercados accionarios, los choques negativos suelen tener un impacto mayor sobre la volatilidad futura que los choques positivos de magnitud similar. Esta característica es especialmente relevante para opciones, porque su valor depende no solo del nivel esperado de volatilidad, sino también de cómo el *market* incorpora episodios de riesgo, caídas del subyacente y cambios en la distribución esperada de retornos. Al combinar esta respuesta asimétrica con una estimación rolling, GJR-GARCH logra adaptarse mejor a condiciones recientes de *market* sin depender de una flexibilidad paramétrica excesiva. Por eso APARCH puede dominar en ajuste histórico, pero GJR-GARCH resulta más consistente cuando el objetivo es reducir errores de valuación.
+
+Desde la aplicación financiera, el hallazgo más claro es que incorporar volatilidad condicional dinámica mejora de forma consistente el *pricing* frente al *benchmark* clásico de volatilidad histórica de 252 días. La mejora fue especialmente fuerte en opciones *at-the-money* y *near-the-money*, donde la sensibilidad del precio a cambios en volatilidad es mayor. En cambio, para opciones deep *OTM/ITM*, la ganancia fue más limitada, lo cual es financieramente razonable ya que en estos contratos, una parte importante del precio está determinada por el valor intrínseco o por probabilidades de ejercicio muy bajas, de modo que sofisticar la estimación de volatilidad aporta menos valor marginal.
+
+El alcance del proyecto no debe entenderse como una comparación restringida a Black-Scholes, sino como una prueba de la idea que cuando un modelo financiero depende de un *input* de volatilidad, sustituir una medida histórica no condicional por una estimación condicional dinámica puede mejorar la calidad de la decisión. En este trabajo dicha idea se evaluó mediante *pricing* de opciones, pero el mismo enfoque puede trasladarse a aplicaciones como VaR, *Expected Shortfall*, *stress testing*, cobertura, asignación de portafolios o simulación de escenarios.
+
+Las limitaciones del estudio abren oportunidades claras para investigación futura. Primero, sería útil replicar la metodología en otros índices, acciones individuales o mercados internacionales para evaluar si la superioridad de GJR-GARCH en *pricing* se mantiene bajo distintas estructuras de liquidez, volatilidad y composición sectorial. Segundo, futuras extensiones podrían incorporar una comparación más detallada por vencimiento, tipo de opción y régimen de *market*, dado que la utilidad de cada modelo puede variar entre periodos de calma y episodios de estrés financiero. Tercero, sería relevante complementar la evaluación de *pricing* con métricas de cobertura, ya que un modelo que minimiza errores de precio no necesariamente minimiza errores de *hedge*. Finalmente, una extensión natural sería comparar este enfoque *plug-in* con modelos de valuación que incorporen la dinámica GARCH directamente bajo una medida de *pricing*.
+
+En conjunto, los resultados apoyan el uso de modelos GARCH asimétricos para aplicaciones financieras de valuación de opciones. La evidencia muestra que modelar explícitamente la persistencia, la reversión y la respuesta asimétrica de la volatilidad aporta información económicamente útil frente a una volatilidad histórica simple. Bajo el diseño empírico de este proyecto, GJR-GARCH con *rolling window* ofrece el mejor balance entre adaptación a condiciones recientes, captura del efecto leverage y precisión en *pricing*.
 
 {{< pagebreak >}}
 
 # Bibliografía
+::: {#refs}
+:::
+
+# Apéndices {.appendix}
+## Apéndice A: Errores en Pronósticos de Varianza Realizada {#sec-apendice-a}
+![Error Varianza Realizada vs Varianza Pronosticada ARCH(1) Fixed-Window](figures/fig-error-ARCH(1) (Fixed-Window).png){#fig-error-arch-fixed}
+![Error Varianza Realizada vs Varianza Pronosticada ARCH(1) Rolling-Window](figures/fig-error-ARCH(1) (Rolling-Window).png){#fig-error-arch-rolling}
+![Error Varianza Realizada vs Varianza Pronosticada GARCH(1,1) Fixed-Window](figures/fig-error-GARCH(1,1) (Fixed-Window).png){#fig-error-garch-fixed}
+![Error Varianza Realizada vs Varianza Pronosticada GARCH(1,1) Rolling-Window](figures/fig-error-GARCH(1,1) (Rolling-Window).png){#fig-error-garch-rolling}
+![Error Varianza Realizada vs Varianza Pronosticada EGARCH(1,1) Fixed-Window](figures/fig-error-EGARCH(1,1) (Fixed-Window).png){#fig-error-egarch-fixed}
+![Error Varianza Realizada vs Varianza Pronosticada EGARCH(1,1) Rolling-Window](figures/fig-error-EGARCH(1,1) (Rolling-Window).png){#fig-error-egarch-rolling}
+![Error Varianza Realizada vs Varianza Pronosticada GJR-GARCH(1,1) Fixed-Window](figures/fig-error-GJR-GARCH(1,1) (Fixed-Window).png){#fig-error-gjr-fixed}
+![Error Varianza Realizada vs Varianza Pronosticada GJR-GARCH(1,1) Rolling-Window](figures/fig-error-GJR-GARCH(1,1) (Rolling-Window).png){#fig-error-gjr-rolling}
+![Error Varianza Realizada vs Varianza Pronosticada APARCH(1,1) Fixed-Window](figures/fig-error-APARCH(1,1) (Fixed-Window).png){#fig-error-aparch-fixed}
+![Error Varianza Realizada vs Varianza Pronosticada APARCH(1,1) Rolling-Window](figures/fig-error-APARCH(1,1) (Rolling-Window).png){#fig-error-aparch-rolling}
+
+```{=latex}
+\clearpage
+```
+
+## Apéndice B: Dispersión Relativa de Varianza Pronosticada frente Varianza Realizada  {#sec-apendice-b}
+
+```{=latex}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-ARCH(1) (Fixed-Window).png}
+\vspace{0.6em}
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-ARCH(1) (Rolling-Window).png}
+\end{figure}
+```
+{{< pagebreak >}}
+```{=latex}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-GARCH(1,1) (Fixed-Window).png}
+\vspace{0.6em}
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-GARCH(1,1) (Rolling-Window).png}
+\end{figure}
+```
+{{< pagebreak >}}
+```{=latex}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-EGARCH(1,1) (Fixed-Window).png}
+\vspace{0.6em}
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-EGARCH(1,1) (Rolling-Window).png}
+\end{figure}
+```
+{{< pagebreak >}}
+```{=latex}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-GJR-GARCH(1,1) (Fixed-Window).png}
+\vspace{0.6em}
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-GJR-GARCH(1,1) (Rolling-Window).png}
+\end{figure}
+```
+{{< pagebreak >}}
+```{=latex}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-APARCH(1,1) (Fixed-Window).png}
+\vspace{0.6em}
+\includegraphics[width=0.95\linewidth,height=0.42\textheight,keepaspectratio]{figures/fig-loglog-APARCH(1,1) (Rolling-Window).png}
+\end{figure}
+```
